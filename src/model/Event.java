@@ -3,28 +3,35 @@ package model;
 import java.time.LocalDateTime;
 
 public class Event {
+    private int id;
     private String name;
-    private Organizer organizer;
+    private String organizerUsername;
     private LocalDateTime date;
     private double price;
     private int capacity;
     private int sold;
 
-    public Event(String name, Organizer organizer, LocalDateTime date, double price, int capacity, int sold) {
+    public Event(int id, String name, String organizerUsername, LocalDateTime date, double price, int capacity,
+            int sold) {
+        this.id = id;
         this.name = name;
-        this.organizer = organizer;
+        this.organizerUsername = organizerUsername;
         this.date = date;
         this.price = price;
         this.capacity = capacity;
         this.sold = sold;
     }
 
+    public int getId() {
+        return this.id;
+    }
+
     public String getName() {
         return this.name;
     }
 
-    public Organizer getOrganizer() {
-        return this.organizer;
+    public String getOrganizerUsername() {
+        return this.organizerUsername;
     }
 
     public LocalDateTime getDate() {
@@ -44,14 +51,16 @@ public class Event {
     }
 
     public boolean equals(Event event) {
-        return this.name.equals(event.getName()) && this.organizer.equals(event.getOrganizer())
+        return this.id == event.id && this.name.equals(event.getName())
+                && this.organizerUsername.equals(event.getOrganizerUsername())
                 && this.date.equals(event.getDate()) && this.price == event.getPrice()
                 && this.capacity == event.getCapacity() && this.sold == event.getSold();
     }
 
     @Override
     public int hashCode() {
-        return this.name.hashCode() + this.organizer.hashCode() + this.date.hashCode() + (int) this.price
+        return (int) this.id + this.name.hashCode() + this.organizerUsername.hashCode() + this.date.hashCode()
+                + (int) this.price
                 + (int) this.capacity + (int) this.sold;
     }
 

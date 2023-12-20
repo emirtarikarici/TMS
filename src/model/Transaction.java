@@ -2,18 +2,18 @@ package model;
 
 public class Transaction {
     private int id;
-    private User user;
-    private Organizer organizer;
+    private String userUsername;
+    private String organizerUsername;
     private double amount;
     private int status;
 
     public static final int STATUS_COMPLETED = 0;
     public static final int STATUS_CANCELLED = 1;
 
-    public Transaction(int id, User user, Organizer organizer, double amount, int status) {
+    public Transaction(int id, String userUsername, String organizerUsername, double amount, int status) {
         this.id = id;
-        this.user = user;
-        this.organizer = organizer;
+        this.userUsername = userUsername;
+        this.organizerUsername = organizerUsername;
         this.amount = amount;
         this.status = status;
     }
@@ -22,12 +22,12 @@ public class Transaction {
         return this.id;
     }
 
-    public User getUser() {
-        return this.user;
+    public String getUser() {
+        return this.userUsername;
     }
 
-    public Organizer getOrganizer() {
-        return this.organizer;
+    public String getOrganizer() {
+        return this.organizerUsername;
     }
 
     public double getAmount() {
@@ -39,13 +39,14 @@ public class Transaction {
     }
 
     public boolean equals(Transaction transaction) {
-        return this.id == transaction.getTransactionNumber() && this.user.equals(transaction.getUser())
-                && this.organizer.equals(transaction.getOrganizer()) && this.amount == transaction.getAmount()
+        return this.id == transaction.getTransactionNumber() && this.userUsername.equals(transaction.getUser())
+                && this.organizerUsername.equals(transaction.getOrganizer()) && this.amount == transaction.getAmount()
                 && this.status == transaction.getStatus();
     }
 
     @Override
     public int hashCode() {
-        return this.id + this.user.hashCode() + this.organizer.hashCode() + (int) this.amount + (int) this.status;
+        return this.id + this.userUsername.hashCode() + this.organizerUsername.hashCode() + (int) this.amount
+                + (int) this.status;
     }
 }
