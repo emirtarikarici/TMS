@@ -44,8 +44,8 @@ public class EventController {
             statement = connection.createStatement();
             if (this.validateEvent(date, location)) {
                 statement.executeUpdate(String.format(
-                        "INSERT INTO event (name, organizerUsername, date, location, capacity, sold) VALUES ('%s', '%s', '%s', %d, %d)",
-                        name, organizerUsername, date.toString(), location, capacity, 0));
+                        "INSERT INTO event (name, organizerUsername, date, location, capacity) VALUES ('%s', '%s', '%s', '%s', %d)",
+                        name, organizerUsername, date.toString(), location, capacity));
                 return true;
             } else {
                 return false;

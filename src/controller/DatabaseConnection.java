@@ -56,41 +56,35 @@ public class DatabaseConnection {
             statement.executeUpdate("CREATE TABLE IF NOT EXISTS `user` (" +
                     "`username` VARCHAR(255) NOT NULL PRIMARY KEY," +
                     "`password` VARCHAR(255) NOT NULL," +
-                    "`balance` DOUBLE NOT NULL)");
+                    "`balance` DOUBLE DEFAULT 0.0)");
 
             statement.executeUpdate("CREATE TABLE IF NOT EXISTS `organizer` (" +
                     "`username` VARCHAR(255) NOT NULL PRIMARY KEY," +
                     "`password` VARCHAR(255) NOT NULL," +
-                    "`balance` DOUBLE NOT NULL)");
+                    "`balance` DOUBLE DEFAULT 0.0)");
 
             statement.executeUpdate("CREATE TABLE IF NOT EXISTS `event` (" +
                     "`id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY," +
                     "`name` VARCHAR(255) NOT NULL," +
-                    "`organizerUsername` VARCHAR(255) NOT NULL," +
+                    "`organizerUsername` VARCHAR(255) NOT NULL REFERENCES `organizer`(`username`)," +
                     "`date` DATETIME NOT NULL," +
                     "`location` VARCHAR(255) NOT NULL," +
                     "`capacity` INT NOT NULL," +
-                    "`sold` INT NOT NULL," +
-                    "FOREIGN KEY (`organizerUsername`) REFERENCES `organizer`(`username`))");
+                    "`sold` INT DEFAULT 0)");
 
             statement.executeUpdate("CREATE TABLE IF NOT EXISTS `ticket` (" +
                     "`id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY," +
-                    "`userUsername` VARCHAR(255) NOT NULL," +
-                    "`eventId` INT NOT NULL," +
-                    "`price` DOUBLE NOT NULL," +
-                    "FOREIGN KEY (`userUsername`) REFERENCES `user`(`username`)," +
-                    "FOREIGN KEY (`eventId`) REFERENCES `event`(`id`))");
+                    "`userUsername` VARCHAR(255) NOT NULL REFERENCES `user`(`username`)," +
+                    "`eventId` INT NOT NULL REFERENCES `event`(`id`)," +
+                    "`price` DOUBLE NOT NULL)");
 
             statement.executeUpdate("CREATE TABLE IF NOT EXISTS `transaction` (" +
                     "`id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY," +
-                    "`userUsername` VARCHAR(255) NOT NULL," +
-                    "`organizerUsername` VARCHAR(255) NOT NULL," +
+                    "`userUsername` VARCHAR(255) NOT NULL REFERENCES `user`(`username`)," +
+                    "`organizerUsername` VARCHAR(255) NOT NULL REFERENCES `organizer`(`username`)," +
                     "`amount` DOUBLE NOT NULL," +
                     "`status` INT NOT NULL," +
-                    "`ticketId` INT NOT NULL," +
-                    "FOREIGN KEY (`userUsername`) REFERENCES `user`(`username`)," +
-                    "FOREIGN KEY (`organizerUsername`) REFERENCES `organizer`(`username`)," +
-                    "FOREIGN KEY (`ticketId`) REFERENCES `ticket`(`id`))");
+                    "`ticketId` INT NOT NULL REFERENCES `ticket`(`id`))");
         } catch (SQLException e) {
             e.printStackTrace();
         }

@@ -16,7 +16,10 @@ public class AccountValidator {
     public boolean validateUsername(String username) {
         try {
             statement = connection.createStatement();
-            resultSet = statement.executeQuery(String.format("SELECT * FROM user WHERE username = '%s'", username));
+            resultSet = statement.executeQuery(String.format(
+                    "(SELECT * FROM user WHERE username = '%s') UNION (SELECT * FROM organizer WHERE username = '%s')",
+                    username,
+                    username));
             if (resultSet.next()) {
                 return false;
             } else {

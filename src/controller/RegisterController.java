@@ -11,12 +11,15 @@ public class RegisterController {
     private Statement statement;
     private AccountValidator accountValidator;
 
+    public static final int USER = 0;
+    public static final int ORGANIZER = 1;
+
     public RegisterController(Connection connection) {
         this.connection = connection;
         this.accountValidator = new AccountValidator(connection);
     }
 
-    public boolean register(String username, String password) {
+    public boolean register(String username, String password, int type) {
         try {
             if (!accountValidator.validateUsername(username)) {
                 JOptionPane.showMessageDialog(new JFrame(), "Username already exists!");
@@ -26,8 +29,13 @@ public class RegisterController {
                 return false;
             } else {
                 statement = connection.createStatement();
-                statement.executeUpdate(String.format("INSERT INTO user (username, password) VALUES ('%s', '%s')",
-                        username, password));
+                if (type == USER) {
+                    statement.executeUpdate(String.format("INSERT INTO user (username, password) VALUES ('%s', '%s')",
+                            username, password));
+                } else if (type == ORGANIZER) {
+                    statement.executeUpdate(String.format(
+                            "INSERT INTO organizer (username, password) VALUES ('%s', '%s')", username, password));
+                }
                 JOptionPane.showMessageDialog(new JFrame(), "Account Created!");
                 return true;
             }

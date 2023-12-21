@@ -21,16 +21,19 @@ public class LoginController {
         try {
             statement = connection.createStatement();
             resultSet = statement.executeQuery(String.format(
-                    "SELECT * FROM user WHERE username = '%s' AND password = '%s'", username, password));
-            if (!username.equals(resultSet.getString("username"))) {
-                JOptionPane.showMessageDialog(new JFrame(), "Username does not exist!");
-                return false;
-            } else if (!password.equals(resultSet.getString("password"))) {
-                JOptionPane.showMessageDialog(new JFrame(), "Password is incorrect!");
-                return false;
+                    "(SELECT * FROM user WHERE username = '%s' AND password = '%s') UNION (SELECT * FROM organizer WHERE username = '%s' AND password = '%s')",
+                    username, password, username, password));
+            if (resultSet.next()) {
+                if (!password.equals(resultSet.getString("password"))) {
+                    JOptionPane.showMessageDialog(new JFrame(), "Password is incorrect!");
+                    return false;
+                } else {
+                    this.isLoggedIn = true;
+                    return true;
+                }
             } else {
-                this.isLoggedIn = true;
-                return true;
+                JOptionPane.showMessageDialog(new JFrame(), "User does not exist!");
+                return false;
             }
         } catch (Exception e) {
             e.printStackTrace();
