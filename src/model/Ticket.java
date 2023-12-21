@@ -3,33 +3,39 @@ package model;
 public class Ticket {
     private int id;
     private String userUsername;
-    private Event event;
+    private int eventId;
+    private double price;
 
-    public Ticket(int id, String userUsername, Event event) {
+    public Ticket(int id, String userUsername, int eventId, int price) {
         this.id = id;
         this.userUsername = userUsername;
-        this.event = event;
+        this.eventId = eventId;
+        this.price = price;
     }
 
     public int getTicketNumber() {
         return this.id;
     }
 
-    public String getUser() {
+    public String getUserUsername() {
         return this.userUsername;
     }
 
-    public Event getEvent() {
-        return this.event;
+    public int getEventId() {
+        return this.eventId;
+    }
+
+    public double getPrice() {
+        return this.price;
     }
 
     public boolean equals(Ticket ticket) {
-        return this.id == ticket.getTicketNumber() && this.userUsername.equals(ticket.getUser())
-                && this.event.equals(ticket.getEvent());
+        return this.id == ticket.getTicketNumber() && this.userUsername.equals(ticket.getUserUsername())
+                && this.eventId == ticket.getEventId() && this.price == ticket.getPrice();
     }
 
     @Override
     public int hashCode() {
-        return this.id + this.userUsername.hashCode() + this.event.hashCode();
+        return this.id + this.userUsername.hashCode() + this.eventId + (int) this.price;
     }
 }
