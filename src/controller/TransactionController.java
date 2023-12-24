@@ -6,11 +6,10 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
 import model.Transaction;
-
-import javax.swing.JFrame;
 
 public class TransactionController {
     private Connection connection;
@@ -45,7 +44,7 @@ public class TransactionController {
         }
     }
 
-    public boolean createTransaction(String userUsername, String organizerUsername, double amount, int ticketId) {
+    public int createTransaction(String userUsername, String organizerUsername, double amount, int ticketId) {
         try {
             statement = connection.createStatement();
             if (this.validateTransaction(userUsername, ticketId)) {
@@ -59,24 +58,29 @@ public class TransactionController {
                         ticketId));
                 statement.executeUpdate(String.format(
                         "INSERT INTO transaction (userUsername, organizerUsername, amount, status, ticketId) VALUES ('%s', '%s', %f, %d, %d)",
-                        userUsername, organizerUsername, amount, Transaction.STATUS_COMPLETED, ticketId));
-                return true;
+                        userUsername, organizerUsername, amount, Transaction.STATUS_COMPLETED, ticketId),
+                        Statement.RETURN_GENERATED_KEYS);
+                resultSet = statement.getGeneratedKeys();
+                return resultSet.next() ? resultSet.getInt(1) : -1;
             } else {
-                return false;
+                return -1;
             }
         } catch (SQLException e) {
             e.printStackTrace();
-            return false;
+            return -1;
         }
     }
 
-    public boolean cancelTransaction(int transactionId) {
+    public boolean cancelTransaction(int id) {
         try {
             statement = connection.createStatement();
             resultSet = statement.executeQuery(String.format(
                     "SELECT userUsername, organizerUsername, amount, status, ticketId FROM transaction WHERE id = %d",
-                    transactionId));
-            if (resultSet.getInt("status") == Transaction.STATUS_COMPLETED) {
+                    id));
+            if (!resultSet.next()) {
+                JOptionPane.showMessageDialog(new JFrame(), "Transaction not found!");
+                return false;
+            } else if (resultSet.getInt("status") == Transaction.STATUS_COMPLETED) {
                 statement.executeUpdate(String.format(
                         "UPDATE user SET balance = balance + %f WHERE username = '%s'", resultSet.getDouble("amount"),
                         resultSet.getString("userUsername")));
@@ -88,7 +92,7 @@ public class TransactionController {
                         resultSet.getInt("ticketId")));
                 statement.executeUpdate(String.format(
                         "UPDATE transaction SET status = %d WHERE id = %d",
-                        Transaction.STATUS_CANCELLED, transactionId));
+                        Transaction.STATUS_CANCELLED, id));
                 return true;
             } else {
                 return false;
@@ -127,7 +131,7 @@ public class TransactionController {
                     "SELECT * FROM transaction WHERE organizerUsername = '%s'", organizerUsername));
             ArrayList<Transaction> transactions = new ArrayList<Transaction>();
             while (resultSet.next()) {
-                transactions.add(new Transaction(resultSet.getInt("transactionId"),
+                transactions.add(new Transaction(resultSet.getInt("id"),
                         resultSet.getString("userUsername"),
                         resultSet.getString("organizerUsername"),
                         resultSet.getDouble("amount"),
@@ -141,13 +145,13 @@ public class TransactionController {
         }
     }
 
-    public Transaction getTransactionById(int transactionId) {
+    public Transaction getTransactionById(int id) {
         try {
             statement = connection.createStatement();
             resultSet = statement.executeQuery(String.format(
-                    "SELECT * FROM transaction WHERE id = %d", transactionId));
+                    "SELECT * FROM transaction WHERE id = %d", id));
             if (resultSet.next()) {
-                return new Transaction(resultSet.getInt("transactionId"),
+                return new Transaction(resultSet.getInt("id"),
                         resultSet.getString("userUsername"),
                         resultSet.getString("organizerUsername"),
                         resultSet.getDouble("amount"),

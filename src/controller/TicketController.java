@@ -16,16 +16,18 @@ public class TicketController {
         this.connection = connection;
     }
 
-    public boolean createTicket(String userUsername, int eventId, double price) {
+    public int createTicket(String userUsername, int eventId, double price) {
         try {
             statement = connection.createStatement();
             statement.executeUpdate(
                     String.format("INSERT INTO ticket (userUsername, eventId, price) VALUES ('%s', %d, %f)",
-                            userUsername, eventId, price));
-            return true;
+                            userUsername, eventId, price),
+                    Statement.RETURN_GENERATED_KEYS);
+            resultSet = statement.getGeneratedKeys();
+            return resultSet.next() ? resultSet.getInt(1) : -1;
         } catch (Exception e) {
             e.printStackTrace();
-            return false;
+            return -1;
         }
     }
 

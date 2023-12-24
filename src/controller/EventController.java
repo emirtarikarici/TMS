@@ -38,21 +38,22 @@ public class EventController {
         }
     }
 
-    public boolean createEvent(String name, String organizerUsername, LocalDateTime date, String location,
+    public int createEvent(String name, String organizerUsername, LocalDateTime date, String location,
             int capacity) {
         try {
             statement = connection.createStatement();
             if (this.validateEvent(date, location)) {
                 statement.executeUpdate(String.format(
                         "INSERT INTO event (name, organizerUsername, date, location, capacity) VALUES ('%s', '%s', '%s', '%s', %d)",
-                        name, organizerUsername, date.toString(), location, capacity));
-                return true;
+                        name, organizerUsername, date.toString(), location, capacity), Statement.RETURN_GENERATED_KEYS);
+                resultSet = statement.getGeneratedKeys();
+                return resultSet.next() ? resultSet.getInt(1) : -1;
             } else {
-                return false;
+                return -1;
             }
         } catch (SQLException e) {
             e.printStackTrace();
-            return false;
+            return -1;
         }
     }
 
@@ -61,7 +62,7 @@ public class EventController {
         try {
             statement = connection.createStatement();
             statement.executeUpdate(String.format(
-                    "UPDATE event SET name = '%s', organizerUsername = '%s', date = '%s', location = '%s', capacity = %d WHERE eventId = %d",
+                    "UPDATE event SET name = '%s', organizerUsername = '%s', date = '%s', location = '%s', capacity = %d WHERE id = %d",
                     name, organizerUsername, date.toString(), location, capacity, eventId));
             return true;
         } catch (SQLException e) {
@@ -74,10 +75,11 @@ public class EventController {
         try {
             statement = connection.createStatement();
             resultSet = statement.executeQuery(String.format(
-                    "SELECT * FROM event WHERE userUsername = '%s'", userUsername));
+                    "SELECT * FROM event WHERE id = (SELECT eventId FROM ticket WHERE userUsername = '%s')",
+                    userUsername));
             ArrayList<Event> events = new ArrayList<Event>();
             while (resultSet.next()) {
-                events.add(new Event(resultSet.getInt("eventId"),
+                events.add(new Event(resultSet.getInt("id"),
                         resultSet.getString("name"),
                         resultSet.getString("organizerUsername"),
                         resultSet.getDate("date").toLocalDate().atStartOfDay(),
@@ -99,7 +101,7 @@ public class EventController {
                     "SELECT * FROM event WHERE organizerUsername = '%s'", organizerUsername));
             ArrayList<Event> events = new ArrayList<Event>();
             while (resultSet.next()) {
-                events.add(new Event(resultSet.getInt("eventId"),
+                events.add(new Event(resultSet.getInt("id"),
                         resultSet.getString("name"),
                         resultSet.getString("organizerUsername"),
                         resultSet.getDate("date").toLocalDate().atStartOfDay(),
@@ -114,12 +116,13 @@ public class EventController {
         }
     }
 
-    public Event getEventById(int eventId) {
+    public Event getEventById(int id) {
         try {
             statement = connection.createStatement();
             resultSet = statement.executeQuery(String.format(
-                    "SELECT * FROM event WHERE eventId = %d", eventId));
-            return new Event(resultSet.getInt("eventId"),
+                    "SELECT * FROM event WHERE id = %d", id));
+            resultSet.next();
+            return new Event(resultSet.getInt("id"),
                     resultSet.getString("name"),
                     resultSet.getString("organizerUsername"),
                     resultSet.getDate("date").toLocalDate().atStartOfDay(),
@@ -138,7 +141,7 @@ public class EventController {
             resultSet = statement.executeQuery("SELECT * FROM event WHERE date < NOW()");
             ArrayList<Event> events = new ArrayList<Event>();
             while (resultSet.next()) {
-                events.add(new Event(resultSet.getInt("eventId"),
+                events.add(new Event(resultSet.getInt("id"),
                         resultSet.getString("name"),
                         resultSet.getString("organizerUsername"),
                         resultSet.getDate("date").toLocalDate().atStartOfDay(),
@@ -159,7 +162,7 @@ public class EventController {
             resultSet = statement.executeQuery("SELECT * FROM event WHERE date > NOW()");
             ArrayList<Event> events = new ArrayList<Event>();
             while (resultSet.next()) {
-                events.add(new Event(resultSet.getInt("eventId"),
+                events.add(new Event(resultSet.getInt("id"),
                         resultSet.getString("name"),
                         resultSet.getString("organizerUsername"),
                         resultSet.getDate("date").toLocalDate().atStartOfDay(),
@@ -180,7 +183,7 @@ public class EventController {
             resultSet = statement.executeQuery("SELECT * FROM event");
             ArrayList<Event> events = new ArrayList<Event>();
             while (resultSet.next()) {
-                events.add(new Event(resultSet.getInt("eventId"),
+                events.add(new Event(resultSet.getInt("id"),
                         resultSet.getString("name"),
                         resultSet.getString("organizerUsername"),
                         resultSet.getDate("date").toLocalDate().atStartOfDay(),
@@ -195,24 +198,26 @@ public class EventController {
         }
     }
 
-    public boolean isEventFull(int eventId) {
+    public boolean isEventFull(int id) {
         try {
             statement = connection.createStatement();
             resultSet = statement.executeQuery(String.format(
-                    "SELECT capacity, sold FROM event WHERE eventId = %d", eventId));
-            return resultSet.getInt("capacity") == resultSet.getInt("sold");
+                    "SELECT capacity, sold FROM event WHERE id = %d", id));
+            return (resultSet.next()) ? resultSet.getInt("capacity") == resultSet.getInt("sold") : false;
         } catch (SQLException e) {
             e.printStackTrace();
             return false;
         }
     }
 
-    public boolean isEventExpired(int eventId) {
+    public boolean isEventExpired(int id) {
         try {
             statement = connection.createStatement();
             resultSet = statement.executeQuery(String.format(
-                    "SELECT date FROM event WHERE eventId = %d", eventId));
-            return resultSet.getDate("date").toLocalDate().atStartOfDay().isBefore(LocalDateTime.now());
+                    "SELECT date FROM event WHERE id = %d", id));
+            return (resultSet.next())
+                    ? resultSet.getDate("date").toLocalDate().atStartOfDay().isBefore(LocalDateTime.now())
+                    : false;
         } catch (SQLException e) {
             e.printStackTrace();
             return false;

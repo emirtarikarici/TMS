@@ -70,11 +70,7 @@ public class UserController {
         try {
             statement = connection.createStatement();
             resultSet = statement.executeQuery(String.format("SELECT * FROM user WHERE username = '%s'", username));
-            if (resultSet.next()) {
-                return resultSet.getDouble("balance");
-            } else {
-                return -1;
-            }
+            return (resultSet.next()) ? resultSet.getDouble("balance") : -1;
         } catch (SQLException e) {
             e.printStackTrace();
             return -1;
