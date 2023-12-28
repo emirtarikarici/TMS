@@ -67,7 +67,7 @@ public class DatabaseConnection {
                     "`id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY," +
                     "`name` VARCHAR(255) NOT NULL," +
                     "`organizerUsername` VARCHAR(255) NOT NULL REFERENCES `organizer`(`username`)," +
-                    "`date` DATETIME NOT NULL," +
+                    "`date` TIMESTAMP NOT NULL," +
                     "`location` VARCHAR(255) NOT NULL," +
                     "`capacity` INT NOT NULL," +
                     "`sold` INT DEFAULT 0)");
