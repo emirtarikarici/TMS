@@ -4,7 +4,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.time.LocalDateTime;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 
 import javax.swing.JFrame;
@@ -21,7 +21,7 @@ public class EventController {
         this.connection = connection;
     }
 
-    private boolean validateEvent(LocalDateTime date, String location) {
+    private boolean validateEvent(Timestamp date, String location) {
         try {
             statement = connection.createStatement();
             resultSet = statement.executeQuery(String.format(
@@ -38,7 +38,7 @@ public class EventController {
         }
     }
 
-    public int createEvent(String name, String organizerUsername, LocalDateTime date, String location,
+    public int createEvent(String name, String organizerUsername, Timestamp date, String location,
             int capacity) {
         try {
             statement = connection.createStatement();
@@ -57,7 +57,7 @@ public class EventController {
         }
     }
 
-    public boolean updateEvent(int eventId, String name, String organizerUsername, LocalDateTime date,
+    public boolean updateEvent(int eventId, String name, String organizerUsername, Timestamp date,
             String location, int capacity) {
         try {
             statement = connection.createStatement();
@@ -82,7 +82,7 @@ public class EventController {
                 events.add(new Event(resultSet.getInt("id"),
                         resultSet.getString("name"),
                         resultSet.getString("organizerUsername"),
-                        resultSet.getDate("date").toLocalDate().atStartOfDay(),
+                        resultSet.getTimestamp("date"),
                         resultSet.getString("location"),
                         resultSet.getInt("capacity"),
                         resultSet.getInt("sold")));
@@ -104,7 +104,7 @@ public class EventController {
                 events.add(new Event(resultSet.getInt("id"),
                         resultSet.getString("name"),
                         resultSet.getString("organizerUsername"),
-                        resultSet.getDate("date").toLocalDate().atStartOfDay(),
+                        resultSet.getTimestamp("date"),
                         resultSet.getString("location"),
                         resultSet.getInt("capacity"),
                         resultSet.getInt("sold")));
@@ -125,7 +125,7 @@ public class EventController {
             return new Event(resultSet.getInt("id"),
                     resultSet.getString("name"),
                     resultSet.getString("organizerUsername"),
-                    resultSet.getDate("date").toLocalDate().atStartOfDay(),
+                    resultSet.getTimestamp("date"),
                     resultSet.getString("location"),
                     resultSet.getInt("capacity"),
                     resultSet.getInt("sold"));
@@ -144,7 +144,7 @@ public class EventController {
                 events.add(new Event(resultSet.getInt("id"),
                         resultSet.getString("name"),
                         resultSet.getString("organizerUsername"),
-                        resultSet.getDate("date").toLocalDate().atStartOfDay(),
+                        resultSet.getTimestamp("date"),
                         resultSet.getString("location"),
                         resultSet.getInt("capacity"),
                         resultSet.getInt("sold")));
@@ -165,7 +165,7 @@ public class EventController {
                 events.add(new Event(resultSet.getInt("id"),
                         resultSet.getString("name"),
                         resultSet.getString("organizerUsername"),
-                        resultSet.getDate("date").toLocalDate().atStartOfDay(),
+                        resultSet.getTimestamp("date"),
                         resultSet.getString("location"),
                         resultSet.getInt("capacity"),
                         resultSet.getInt("sold")));
@@ -186,7 +186,7 @@ public class EventController {
                 events.add(new Event(resultSet.getInt("id"),
                         resultSet.getString("name"),
                         resultSet.getString("organizerUsername"),
-                        resultSet.getDate("date").toLocalDate().atStartOfDay(),
+                        resultSet.getTimestamp("date"),
                         resultSet.getString("location"),
                         resultSet.getInt("capacity"),
                         resultSet.getInt("sold")));
@@ -216,7 +216,7 @@ public class EventController {
             resultSet = statement.executeQuery(String.format(
                     "SELECT date FROM event WHERE id = %d", id));
             return (resultSet.next())
-                    ? resultSet.getDate("date").toLocalDate().atStartOfDay().isBefore(LocalDateTime.now())
+                    ? resultSet.getTimestamp("date").before(new Timestamp(System.currentTimeMillis()))
                     : false;
         } catch (SQLException e) {
             e.printStackTrace();

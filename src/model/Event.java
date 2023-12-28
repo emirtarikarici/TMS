@@ -1,17 +1,17 @@
 package model;
 
-import java.time.LocalDateTime;
+import java.sql.Timestamp;
 
 public class Event {
     private int id;
     private String name;
     private String organizerUsername;
-    private LocalDateTime date;
+    private Timestamp date;
     private String location;
     private int capacity;
     private int sold;
 
-    public Event(int id, String name, String organizerUsername, LocalDateTime date, String location, int capacity,
+    public Event(int id, String name, String organizerUsername, Timestamp date, String location, int capacity,
             int sold) {
         this.id = id;
         this.name = name;
@@ -34,13 +34,14 @@ public class Event {
         return this.organizerUsername;
     }
 
-    public LocalDateTime getDate() {
+    public Timestamp getDate() {
         return this.date;
     }
 
     public String getLocation() {
         return this.location;
     }
+
     public int getCapacity() {
         return this.capacity;
     }
