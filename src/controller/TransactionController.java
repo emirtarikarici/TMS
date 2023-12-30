@@ -20,12 +20,12 @@ public class TransactionController {
         this.connection = connection;
     }
 
-    public boolean validateTransaction(String username, int eventId) {
+    public boolean validateTransaction(String username, int ticketId) {
         try {
             statement = connection.createStatement();
             resultSet = statement.executeQuery(String.format(
-                    "SELECT user.balance AS balance, ticket.price AS price, event.capacity AS capacity, event.sold AS sold FROM user, event, ticket WHERE user.username = '%s' AND event.id = %d AND ticket.eventId = %d",
-                    username, eventId, eventId));
+                    "SELECT user.balance AS balance, ticket.price AS price, event.capacity AS capacity, event.sold AS sold FROM user, event, ticket WHERE user.username = '%s' AND ticket.id = %d AND event.id = (SELECT eventId FROM ticket WHERE id = %d)",
+                    username, ticketId, ticketId));
             if (!resultSet.next()) {
                 JOptionPane.showMessageDialog(new JFrame(), "User, event or ticket not found!");
                 return false;
