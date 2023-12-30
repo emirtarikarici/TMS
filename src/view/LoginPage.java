@@ -17,6 +17,10 @@ import java.awt.event.MouseEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import javax.swing.SwingConstants;
+
+import view.organizer.OrganizerMainPage;
+import view.user.UserMainPage;
+
 import javax.swing.JComboBox;
 
 public class LoginPage extends JFrame{
@@ -136,22 +140,46 @@ public class LoginPage extends JFrame{
                 System.out.println(usernameText);
                 System.out.println(passwordText);
 
-                if (passwordText.equals("1")) {   // if (login(usernameText,passwordText))
-                    textMessage.setText("Successfully login");
-                    frmLoginpage.dispose();
-                    System.out.println("LOGIB BUTTON CLICKED, MOVING TO THE MAIN PAGE");
-                    try {
-                        MainPage mPage = new MainPage();
-                        mPage.setVisible(true);
-                    } catch (Exception e1) {
-                        e1.printStackTrace();
+                if(comboBox.getSelectedItem().equals("User")) {
+                    if (passwordText.equals("1")) {   // if (login(usernameText,passwordText))
+                        textMessage.setText("Successfully login");
+                        frmLoginpage.dispose();
+                        System.out.println("LOGIB BUTTON CLICKED, MOVING TO THE MAIN PAGE");
+                        try {
+                            UserMainPage mPage = new UserMainPage();
+                            mPage.setVisible(true);
+                        } catch (Exception e1) {
+                            e1.printStackTrace();
+                        }
                     }
 
-                }
-                else {
-                    textMessage.setText("username or/and password are wrong!!!");
 
+                    else {
+                        textMessage.setText("username or/and password are wrong!!!");
+
+                    }
                 }
+
+                else {
+                    if (passwordText.equals("1")) {   // if (login(usernameText,passwordText))
+                        textMessage.setText("Successfully login");
+                        frmLoginpage.dispose();
+                        System.out.println("LOGIB BUTTON CLICKED, MOVING TO THE MAIN PAGE");
+                        try {
+                            OrganizerMainPage omPage = new OrganizerMainPage();
+                            omPage.setVisible(true);
+                        } catch (Exception e1) {
+                            e1.printStackTrace();
+                        }
+                    }
+
+
+                    else {
+                        textMessage.setText("username or/and password are wrong!!!");
+
+                    }
+                }
+
 
 
             }

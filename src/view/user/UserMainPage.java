@@ -1,4 +1,4 @@
-package view;
+package view.user;
 
 import java.awt.EventQueue;
 
@@ -7,7 +7,7 @@ import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.JLabel;
 
-public class MainPage extends JFrame {
+public class UserMainPage extends JFrame {
 
     private static final long serialVersionUID = 1L;
     private JPanel contentPane;
@@ -17,7 +17,7 @@ public class MainPage extends JFrame {
         EventQueue.invokeLater(new Runnable() {
             public void run() {
                 try {
-                    MainPage frame = new MainPage();
+                    UserMainPage frame = new UserMainPage();
                     frame.setVisible(true);
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -27,7 +27,7 @@ public class MainPage extends JFrame {
     }
 
 
-    public MainPage() {
+    public UserMainPage() {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setBounds(100, 100, 500, 500);
         contentPane = new JPanel();
@@ -35,7 +35,7 @@ public class MainPage extends JFrame {
 
         setContentPane(contentPane);
 
-        JLabel lblNewLabel = new JLabel("Hüseyin");
+        JLabel lblNewLabel = new JLabel("User Main Page");
         contentPane.add(lblNewLabel);
     }
 
