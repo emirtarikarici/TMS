@@ -1,14 +1,14 @@
 package controller;
 
 import java.sql.Connection;
-import java.sql.Statement;
+import java.sql.PreparedStatement;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
 public class RegisterController {
     private Connection connection;
-    private Statement statement;
+    private PreparedStatement preparedStatement;
     private AccountValidator accountValidator;
 
     public static final int USER = 0;
@@ -28,14 +28,16 @@ public class RegisterController {
                 JOptionPane.showMessageDialog(new JFrame(), "Password must be at least 6 characters!");
                 return false;
             } else {
-                statement = connection.createStatement();
                 if (type == USER) {
-                    statement.executeUpdate(String.format("INSERT INTO user (username, password) VALUES ('%s', '%s')",
-                            username, password));
+                    preparedStatement = connection
+                            .prepareStatement("INSERT INTO user (username, password) VALUES (?, ?)");
                 } else if (type == ORGANIZER) {
-                    statement.executeUpdate(String.format(
-                            "INSERT INTO organizer (username, password) VALUES ('%s', '%s')", username, password));
+                    preparedStatement = connection
+                            .prepareStatement("INSERT INTO organizer (username, password) VALUES (?, ?)");
                 }
+                preparedStatement.setString(1, username);
+                preparedStatement.setString(2, password);
+                preparedStatement.executeUpdate();
                 JOptionPane.showMessageDialog(new JFrame(), "Account Created!");
                 return true;
             }

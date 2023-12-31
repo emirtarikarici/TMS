@@ -1,9 +1,9 @@
 package controller;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 
 import javax.swing.JFrame;
@@ -13,7 +13,7 @@ import model.Transaction;
 
 public class TransactionController {
     private Connection connection;
-    private Statement statement;
+    private PreparedStatement preparedStatement;
     private ResultSet resultSet;
 
     public TransactionController(Connection connection) {
@@ -22,10 +22,12 @@ public class TransactionController {
 
     public boolean validateTransaction(String username, int ticketId) {
         try {
-            statement = connection.createStatement();
-            resultSet = statement.executeQuery(String.format(
-                    "SELECT user.balance AS balance, ticket.price AS price, event.capacity AS capacity, event.sold AS sold FROM user, event, ticket WHERE user.username = '%s' AND ticket.id = %d AND event.id = (SELECT eventId FROM ticket WHERE id = %d)",
-                    username, ticketId, ticketId));
+            preparedStatement = connection.prepareStatement(
+                    "SELECT user.balance AS balance, ticket.price AS price, event.capacity AS capacity, event.sold AS sold FROM user, event, ticket WHERE user.username = ? AND ticket.id = ? AND event.id = (SELECT eventId FROM ticket WHERE id = ?)");
+            preparedStatement.setString(1, username);
+            preparedStatement.setInt(2, ticketId);
+            preparedStatement.setInt(3, ticketId);
+            resultSet = preparedStatement.executeQuery();
             if (!resultSet.next()) {
                 JOptionPane.showMessageDialog(new JFrame(), "User, event or ticket not found!");
                 return false;
@@ -46,21 +48,31 @@ public class TransactionController {
 
     public int createTransaction(String userUsername, String organizerUsername, double amount, int ticketId) {
         try {
-            statement = connection.createStatement();
             if (this.validateTransaction(userUsername, ticketId)) {
-                statement.executeUpdate(String.format(
-                        "UPDATE user SET balance = balance - %f WHERE username = '%s'", amount, userUsername));
-                statement.executeUpdate(String.format(
-                        "UPDATE organizer SET balance = balance + %f WHERE username = '%s'", amount,
-                        organizerUsername));
-                statement.executeUpdate(String.format(
-                        "UPDATE event SET sold = sold + 1 WHERE id = (SELECT eventId FROM ticket WHERE id = %d)",
-                        ticketId));
-                statement.executeUpdate(String.format(
-                        "INSERT INTO transaction (userUsername, organizerUsername, amount, status, ticketId) VALUES ('%s', '%s', %f, %d, %d)",
-                        userUsername, organizerUsername, amount, Transaction.STATUS_COMPLETED, ticketId),
-                        Statement.RETURN_GENERATED_KEYS);
-                resultSet = statement.getGeneratedKeys();
+                preparedStatement = connection.prepareStatement(
+                        "UPDATE user SET balance = balance - ? WHERE username = ?");
+                preparedStatement.setDouble(1, amount);
+                preparedStatement.setString(2, userUsername);
+                preparedStatement.executeUpdate();
+                preparedStatement = connection.prepareStatement(
+                        "UPDATE organizer SET balance = balance + ? WHERE username = ?");
+                preparedStatement.setDouble(1, amount);
+                preparedStatement.setString(2, organizerUsername);
+                preparedStatement.executeUpdate();
+                preparedStatement = connection.prepareStatement(
+                        "UPDATE event SET sold = sold + 1 WHERE id = (SELECT eventId FROM ticket WHERE id = ?)");
+                preparedStatement.setInt(1, ticketId);
+                preparedStatement.executeUpdate();
+                preparedStatement = connection.prepareStatement(
+                        "INSERT INTO transaction (userUsername, organizerUsername, amount, status, ticketId) VALUES (?, ?, ?, ?, ?)",
+                        PreparedStatement.RETURN_GENERATED_KEYS);
+                preparedStatement.setString(1, userUsername);
+                preparedStatement.setString(2, organizerUsername);
+                preparedStatement.setDouble(3, amount);
+                preparedStatement.setInt(4, Transaction.STATUS_COMPLETED);
+                preparedStatement.setInt(5, ticketId);
+                preparedStatement.executeUpdate();
+                resultSet = preparedStatement.getGeneratedKeys();
                 return resultSet.next() ? resultSet.getInt(1) : -1;
             } else {
                 return -1;
@@ -73,26 +85,33 @@ public class TransactionController {
 
     public boolean cancelTransaction(int id) {
         try {
-            statement = connection.createStatement();
-            resultSet = statement.executeQuery(String.format(
-                    "SELECT userUsername, organizerUsername, amount, status, ticketId FROM transaction WHERE id = %d",
-                    id));
+            preparedStatement = connection.prepareStatement(
+                    "SELECT userUsername, organizerUsername, amount, status, ticketId FROM transaction WHERE id = ?");
+            preparedStatement.setInt(1, id);
+            resultSet = preparedStatement.executeQuery();
             if (!resultSet.next()) {
                 JOptionPane.showMessageDialog(new JFrame(), "Transaction not found!");
                 return false;
             } else if (resultSet.getInt("status") == Transaction.STATUS_COMPLETED) {
-                statement.executeUpdate(String.format(
-                        "UPDATE user SET balance = balance + %f WHERE username = '%s'", resultSet.getDouble("amount"),
-                        resultSet.getString("userUsername")));
-                statement.executeUpdate(String.format(
-                        "UPDATE organizer SET balance = balance - %f WHERE username = '%s'",
-                        resultSet.getDouble("amount"), resultSet.getString("organizerUsername")));
-                statement.executeUpdate(String.format(
-                        "UPDATE event SET sold = sold - 1 WHERE id = (SELECT eventId FROM ticket WHERE id = %d)",
-                        resultSet.getInt("ticketId")));
-                statement.executeUpdate(String.format(
-                        "UPDATE transaction SET status = %d WHERE id = %d",
-                        Transaction.STATUS_CANCELLED, id));
+                preparedStatement = connection.prepareStatement(
+                        "UPDATE user SET balance = balance + ? WHERE username = ?");
+                preparedStatement.setDouble(1, resultSet.getDouble("amount"));
+                preparedStatement.setString(2, resultSet.getString("userUsername"));
+                preparedStatement.executeUpdate();
+                preparedStatement = connection.prepareStatement(
+                        "UPDATE organizer SET balance = balance - ? WHERE username = ?");
+                preparedStatement.setDouble(1, resultSet.getDouble("amount"));
+                preparedStatement.setString(2, resultSet.getString("organizerUsername"));
+                preparedStatement.executeUpdate();
+                preparedStatement = connection.prepareStatement(
+                        "UPDATE event SET sold = sold - 1 WHERE id = (SELECT eventId FROM ticket WHERE id = ?)");
+                preparedStatement.setInt(1, resultSet.getInt("ticketId"));
+                preparedStatement.executeUpdate();
+                preparedStatement = connection.prepareStatement(
+                        "UPDATE transaction SET status = ? WHERE id = ?");
+                preparedStatement.setInt(1, Transaction.STATUS_CANCELLED);
+                preparedStatement.setInt(2, id);
+                preparedStatement.executeUpdate();
                 return true;
             } else {
                 return false;
@@ -105,9 +124,9 @@ public class TransactionController {
 
     public ArrayList<Transaction> getTransactionByUser(String userUsername) {
         try {
-            statement = connection.createStatement();
-            resultSet = statement.executeQuery(String.format(
-                    "SELECT * FROM transaction WHERE userUsername = '%s'", userUsername));
+            preparedStatement = connection.prepareStatement("SELECT * FROM transaction WHERE userUsername = ?");
+            preparedStatement.setString(1, userUsername);
+            resultSet = preparedStatement.executeQuery();
             ArrayList<Transaction> transactions = new ArrayList<Transaction>();
             while (resultSet.next()) {
                 transactions.add(new Transaction(resultSet.getInt("id"),
@@ -126,9 +145,9 @@ public class TransactionController {
 
     public ArrayList<Transaction> getTransactionByOrganizer(String organizerUsername) {
         try {
-            statement = connection.createStatement();
-            resultSet = statement.executeQuery(String.format(
-                    "SELECT * FROM transaction WHERE organizerUsername = '%s'", organizerUsername));
+            preparedStatement = connection.prepareStatement("SELECT * FROM transaction WHERE organizerUsername = ?");
+            preparedStatement.setString(1, organizerUsername);
+            resultSet = preparedStatement.executeQuery();
             ArrayList<Transaction> transactions = new ArrayList<Transaction>();
             while (resultSet.next()) {
                 transactions.add(new Transaction(resultSet.getInt("id"),
@@ -147,9 +166,9 @@ public class TransactionController {
 
     public Transaction getTransactionById(int id) {
         try {
-            statement = connection.createStatement();
-            resultSet = statement.executeQuery(String.format(
-                    "SELECT * FROM transaction WHERE id = %d", id));
+            preparedStatement = connection.prepareStatement("SELECT * FROM transaction WHERE id = ?");
+            preparedStatement.setInt(1, id);
+            resultSet = preparedStatement.executeQuery();
             if (resultSet.next()) {
                 return new Transaction(resultSet.getInt("id"),
                         resultSet.getString("userUsername"),
@@ -168,8 +187,8 @@ public class TransactionController {
 
     public ArrayList<Transaction> getAllTransactions() {
         try {
-            statement = connection.createStatement();
-            resultSet = statement.executeQuery("SELECT * FROM transaction");
+            preparedStatement = connection.prepareStatement("SELECT * FROM transaction");
+            resultSet = preparedStatement.executeQuery();
             ArrayList<Transaction> transactions = new ArrayList<Transaction>();
             while (resultSet.next()) {
                 transactions.add(new Transaction(resultSet.getInt("id"),
@@ -188,9 +207,9 @@ public class TransactionController {
 
     public ArrayList<Transaction> getCompletedTransactions() {
         try {
-            statement = connection.createStatement();
-            resultSet = statement.executeQuery(String.format(
-                    "SELECT * FROM transaction WHERE status = %d", Transaction.STATUS_COMPLETED));
+            preparedStatement = connection.prepareStatement("SELECT * FROM transaction WHERE status = ?");
+            preparedStatement.setInt(1, Transaction.STATUS_COMPLETED);
+            resultSet = preparedStatement.executeQuery();
             ArrayList<Transaction> transactions = new ArrayList<Transaction>();
             while (resultSet.next()) {
                 transactions.add(new Transaction(resultSet.getInt("id"),
@@ -209,9 +228,9 @@ public class TransactionController {
 
     public ArrayList<Transaction> getCancelledTransactions() {
         try {
-            statement = connection.createStatement();
-            resultSet = statement.executeQuery(String.format(
-                    "SELECT * FROM transaction WHERE status = %d", Transaction.STATUS_CANCELLED));
+            preparedStatement = connection.prepareStatement("SELECT * FROM transaction WHERE status = ?");
+            preparedStatement.setInt(1, Transaction.STATUS_CANCELLED);
+            resultSet = preparedStatement.executeQuery();
             ArrayList<Transaction> transactions = new ArrayList<Transaction>();
             while (resultSet.next()) {
                 transactions.add(new Transaction(resultSet.getInt("id"),
@@ -230,10 +249,10 @@ public class TransactionController {
 
     public ArrayList<Transaction> getTransactionsByEvent(int eventId) {
         try {
-            statement = connection.createStatement();
-            resultSet = statement.executeQuery(String.format(
-                    "SELECT * FROM transaction WHERE ticketId = (SELECT id FROM ticket WHERE eventId = %d)",
-                    eventId));
+            preparedStatement = connection.prepareStatement(
+                    "SELECT * FROM transaction WHERE ticketId = (SELECT id FROM ticket WHERE eventId = ?)");
+            preparedStatement.setInt(1, eventId);
+            resultSet = preparedStatement.executeQuery();
             ArrayList<Transaction> transactions = new ArrayList<Transaction>();
             while (resultSet.next()) {
                 transactions.add(new Transaction(resultSet.getInt("id"),
@@ -252,9 +271,9 @@ public class TransactionController {
 
     public Transaction getTransactionByTicket(int ticketId) {
         try {
-            statement = connection.createStatement();
-            resultSet = statement.executeQuery(String.format(
-                    "SELECT * FROM transaction WHERE ticketId = %d", ticketId));
+            preparedStatement = connection.prepareStatement("SELECT * FROM transaction WHERE ticketId = ?");
+            preparedStatement.setInt(1, ticketId);
+            resultSet = preparedStatement.executeQuery();
             if (resultSet.next()) {
                 return new Transaction(resultSet.getInt("id"),
                         resultSet.getString("userUsername"),
