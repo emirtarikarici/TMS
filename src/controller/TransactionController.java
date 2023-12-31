@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
+import model.Ticket;
 import model.Transaction;
 
 public class TransactionController {
@@ -23,7 +24,7 @@ public class TransactionController {
     public boolean validateTransaction(String username, int ticketId) {
         try {
             preparedStatement = connection.prepareStatement(
-                    "SELECT user.balance AS balance, ticket.price AS price, event.capacity AS capacity, event.sold AS sold FROM user, event, ticket WHERE user.username = ? AND ticket.id = ? AND event.id = (SELECT eventId FROM ticket WHERE id = ?)");
+                    "SELECT user.balance AS balance, event.price AS price, event.capacity AS capacity, event.sold AS sold FROM user, event, ticket WHERE user.username = ? AND ticket.id = ? AND event.id = (SELECT eventId FROM ticket WHERE id = ?)");
             preparedStatement.setString(1, username);
             preparedStatement.setInt(2, ticketId);
             preparedStatement.setInt(3, ticketId);
@@ -33,9 +34,15 @@ public class TransactionController {
                 return false;
             } else if (!(resultSet.getDouble("balance") >= resultSet.getDouble("price"))) {
                 JOptionPane.showMessageDialog(new JFrame(), "Insufficient balance!");
+                preparedStatement = connection.prepareStatement("DELETE FROM ticket WHERE id = ?");
+                preparedStatement.setInt(1, ticketId);
+                preparedStatement.executeUpdate();
                 return false;
             } else if (!(resultSet.getInt("capacity") > resultSet.getInt("sold"))) {
                 JOptionPane.showMessageDialog(new JFrame(), "Event is full!");
+                preparedStatement = connection.prepareStatement("DELETE FROM ticket WHERE id = ?");
+                preparedStatement.setInt(1, ticketId);
+                preparedStatement.executeUpdate();
                 return false;
             } else {
                 return true;
@@ -46,8 +53,18 @@ public class TransactionController {
         }
     }
 
-    public int createTransaction(String userUsername, String organizerUsername, double amount, int ticketId) {
+    public int createTransaction(String userUsername, String organizerUsername, int ticketId) {
         try {
+            preparedStatement = connection.prepareStatement(
+                    "SELECT event.price FROM ticket, event WHERE ticket.id = ? AND event.id = (SELECT eventId FROM ticket WHERE id = ?)");
+            preparedStatement.setInt(1, ticketId);
+            preparedStatement.setInt(2, ticketId);
+            resultSet = preparedStatement.executeQuery();
+            if (!resultSet.next()) {
+                JOptionPane.showMessageDialog(new JFrame(), "Ticket or event not found!");
+                return -1;
+            }
+            double amount = resultSet.getDouble("price");
             if (this.validateTransaction(userUsername, ticketId)) {
                 preparedStatement = connection.prepareStatement(
                         "UPDATE user SET balance = balance - ? WHERE username = ?");
@@ -111,6 +128,11 @@ public class TransactionController {
                         "UPDATE transaction SET status = ? WHERE id = ?");
                 preparedStatement.setInt(1, Transaction.STATUS_CANCELLED);
                 preparedStatement.setInt(2, id);
+                preparedStatement.executeUpdate();
+                preparedStatement = connection.prepareStatement(
+                        "UPDATE ticket SET status = ? WHERE id = ?");
+                preparedStatement.setInt(1, Ticket.CANCELLED);
+                preparedStatement.setInt(2, resultSet.getInt("ticketId"));
                 preparedStatement.executeUpdate();
                 return true;
             } else {

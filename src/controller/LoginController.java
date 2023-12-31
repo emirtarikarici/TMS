@@ -54,20 +54,6 @@ public class LoginController {
 
     public int getAccountType(String username) {
         try {
-            /*
-             * statement = connection.createStatement();
-             * if (statement.executeQuery(String.format(
-             * "SELECT * FROM user WHERE username = '%s'", username)).next()) {
-             * return RegisterController.USER;
-             * } else if (statement.executeQuery(String.format(
-             * "SELECT * FROM organizer WHERE username = '%s'", username)).next()) {
-             * return RegisterController.ORGANIZER;
-             * } else {
-             * System.out.println("User does not exist!");
-             * return -1;
-             * }
-             */
-
             preparedStatement = connection.prepareStatement("SELECT * FROM user WHERE username = ?");
             preparedStatement.setString(1, username);
             resultSet = preparedStatement.executeQuery();

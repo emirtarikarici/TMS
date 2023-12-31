@@ -71,13 +71,14 @@ public class DatabaseConnection {
                     "`location` VARCHAR(255) NOT NULL," +
                     "`capacity` INT NOT NULL," +
                     "`sold` INT DEFAULT 0, " +
+                    "`price` DOUBLE NOT NULL," +
                     "FOREIGN KEY (`organizerUsername`) REFERENCES `organizer`(`username`))");
 
             statement.executeUpdate("CREATE TABLE IF NOT EXISTS `ticket` (" +
                     "`id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY," +
                     "`userUsername` VARCHAR(255) NOT NULL," +
                     "`eventId` INT NOT NULL," +
-                    "`price` DOUBLE NOT NULL," +
+                    "`status` INT NOT NULL," +
                     "FOREIGN KEY (`userUsername`) REFERENCES `user`(`username`)," +
                     "FOREIGN KEY (`eventId`) REFERENCES `event`(`id`))");
 
