@@ -1,13 +1,13 @@
 package controller;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 
 public class UserController {
     private Connection connection;
-    private Statement statement;
+    private PreparedStatement preparedStatement;
     private ResultSet resultSet;
     private AccountValidator accountValidator;
 
@@ -18,12 +18,13 @@ public class UserController {
 
     public boolean changeUsername(String username, String newUsername) {
         try {
-            statement = connection.createStatement();
             if (!accountValidator.validateUsername(newUsername)) {
                 return false;
             } else {
-                statement.executeUpdate(String.format("UPDATE user SET username = '%s' WHERE username = '%s'",
-                        newUsername, username));
+                preparedStatement = connection.prepareStatement("UPDATE user SET username = ? WHERE username = ?");
+                preparedStatement.setString(1, newUsername);
+                preparedStatement.setString(2, username);
+                preparedStatement.executeUpdate();
                 return true;
             }
         } catch (Exception e) {
@@ -34,12 +35,13 @@ public class UserController {
 
     public boolean changePassword(String username, String newPassword) {
         try {
-            statement = connection.createStatement();
             if (!accountValidator.validatePassword(newPassword)) {
                 return false;
             } else {
-                statement.executeUpdate(String.format("UPDATE user SET password = '%s' WHERE username = '%s'",
-                        newPassword, username));
+                preparedStatement = connection.prepareStatement("UPDATE user SET password = ? WHERE username = ?");
+                preparedStatement.setString(1, newPassword);
+                preparedStatement.setString(2, username);
+                preparedStatement.executeUpdate();
                 return true;
             }
         } catch (Exception e) {
@@ -50,12 +52,28 @@ public class UserController {
 
     public boolean addBalance(String username, double amount) {
         try {
-            statement = connection.createStatement();
-            resultSet = statement.executeQuery(String.format("SELECT * FROM user WHERE username = '%s'", username));
+            /*
+             * statement = connection.createStatement();
+             * resultSet = statement.executeQuery(String.
+             * format("SELECT * FROM user WHERE username = '%s'", username));
+             * if (resultSet.next()) {
+             * double balance = resultSet.getDouble("balance");
+             * statement.executeUpdate(String.
+             * format("UPDATE user SET balance = %f WHERE username = '%s'",
+             * balance + amount, username));
+             * return true;
+             * } else {
+             * return false;
+             * }
+             */
+            preparedStatement = connection.prepareStatement(("SELECT * FROM user WHERE username = ?"));
+            preparedStatement.setString(1, username);
+            resultSet = preparedStatement.executeQuery();
             if (resultSet.next()) {
-                double balance = resultSet.getDouble("balance");
-                statement.executeUpdate(String.format("UPDATE user SET balance = %f WHERE username = '%s'",
-                        balance + amount, username));
+                preparedStatement = connection.prepareStatement("UPDATE user SET balance = ? WHERE username = ?");
+                preparedStatement.setDouble(1, resultSet.getDouble("balance") + amount);
+                preparedStatement.setString(2, username);
+                preparedStatement.executeUpdate();
                 return true;
             } else {
                 return false;
@@ -68,8 +86,9 @@ public class UserController {
 
     public double getBalance(String username) {
         try {
-            statement = connection.createStatement();
-            resultSet = statement.executeQuery(String.format("SELECT * FROM user WHERE username = '%s'", username));
+            preparedStatement = connection.prepareStatement("SELECT * FROM user WHERE username = ?");
+            preparedStatement.setString(1, username);
+            resultSet = preparedStatement.executeQuery();
             return (resultSet.next()) ? resultSet.getDouble("balance") : -1;
         } catch (SQLException e) {
             e.printStackTrace();

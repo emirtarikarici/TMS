@@ -1,6 +1,7 @@
 package controller;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -14,7 +15,7 @@ import model.Event;
 
 public class EventController {
     private Connection connection;
-    private Statement statement;
+    private PreparedStatement preparedStatement;
     private ResultSet resultSet;
 
     public EventController(Connection connection) {
@@ -23,9 +24,10 @@ public class EventController {
 
     private boolean validateEvent(Timestamp date, String location) {
         try {
-            statement = connection.createStatement();
-            resultSet = statement.executeQuery(String.format(
-                    "SELECT * FROM event WHERE date = '%s' AND location = '%s'", date.toString(), location));
+            preparedStatement = connection.prepareStatement("SELECT * FROM event WHERE date = ? AND location = ?");
+            preparedStatement.setTimestamp(1, date);
+            preparedStatement.setString(2, location);
+            resultSet = preparedStatement.executeQuery();
             if (resultSet.next()) {
                 JOptionPane.showMessageDialog(new JFrame(), "An event already exists at specified date and location!");
                 return false;
@@ -38,15 +40,19 @@ public class EventController {
         }
     }
 
-    public int createEvent(String name, String organizerUsername, Timestamp date, String location,
-            int capacity) {
+    public int createEvent(String name, String organizerUsername, Timestamp date, String location, int capacity) {
         try {
-            statement = connection.createStatement();
             if (this.validateEvent(date, location)) {
-                statement.executeUpdate(String.format(
-                        "INSERT INTO event (name, organizerUsername, date, location, capacity) VALUES ('%s', '%s', '%s', '%s', %d)",
-                        name, organizerUsername, date.toString(), location, capacity), Statement.RETURN_GENERATED_KEYS);
-                resultSet = statement.getGeneratedKeys();
+                preparedStatement = connection.prepareStatement(
+                        "INSERT INTO event (name, organizerUsername, date, location, capacity) VALUES (?, ?, ?, ?, ?)",
+                        Statement.RETURN_GENERATED_KEYS);
+                preparedStatement.setString(1, name);
+                preparedStatement.setString(2, organizerUsername);
+                preparedStatement.setTimestamp(3, date);
+                preparedStatement.setString(4, location);
+                preparedStatement.setInt(5, capacity);
+                preparedStatement.executeUpdate();
+                resultSet = preparedStatement.getGeneratedKeys();
                 return resultSet.next() ? resultSet.getInt(1) : -1;
             } else {
                 return -1;
@@ -60,10 +66,15 @@ public class EventController {
     public boolean updateEvent(int eventId, String name, String organizerUsername, Timestamp date,
             String location, int capacity) {
         try {
-            statement = connection.createStatement();
-            statement.executeUpdate(String.format(
-                    "UPDATE event SET name = '%s', organizerUsername = '%s', date = '%s', location = '%s', capacity = %d WHERE id = %d",
-                    name, organizerUsername, date.toString(), location, capacity, eventId));
+            preparedStatement = connection.prepareStatement(
+                    "UPDATE event SET name = ?, organizerUsername = ?, date = ?, location = ?, capacity = ? WHERE id = ?");
+            preparedStatement.setString(1, name);
+            preparedStatement.setString(2, organizerUsername);
+            preparedStatement.setTimestamp(3, date);
+            preparedStatement.setString(4, location);
+            preparedStatement.setInt(5, capacity);
+            preparedStatement.setInt(6, eventId);
+            preparedStatement.executeUpdate();
             return true;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -73,10 +84,10 @@ public class EventController {
 
     public ArrayList<Event> getEventsByUser(String userUsername) {
         try {
-            statement = connection.createStatement();
-            resultSet = statement.executeQuery(String.format(
-                    "SELECT * FROM event WHERE id = (SELECT eventId FROM ticket WHERE userUsername = '%s')",
-                    userUsername));
+            preparedStatement = connection.prepareStatement(
+                    "SELECT * FROM event WHERE id IN (SELECT eventId FROM ticket WHERE userUsername = ?)");
+            preparedStatement.setString(1, userUsername);
+            resultSet = preparedStatement.executeQuery();
             ArrayList<Event> events = new ArrayList<Event>();
             while (resultSet.next()) {
                 events.add(new Event(resultSet.getInt("id"),
@@ -96,9 +107,10 @@ public class EventController {
 
     public ArrayList<Event> getEventsByOrganizer(String organizerUsername) {
         try {
-            statement = connection.createStatement();
-            resultSet = statement.executeQuery(String.format(
-                    "SELECT * FROM event WHERE organizerUsername = '%s'", organizerUsername));
+            preparedStatement = connection.prepareStatement(
+                    "SELECT * FROM event WHERE organizerUsername = ?");
+            preparedStatement.setString(1, organizerUsername);
+            resultSet = preparedStatement.executeQuery();
             ArrayList<Event> events = new ArrayList<Event>();
             while (resultSet.next()) {
                 events.add(new Event(resultSet.getInt("id"),
@@ -118,9 +130,9 @@ public class EventController {
 
     public Event getEventById(int id) {
         try {
-            statement = connection.createStatement();
-            resultSet = statement.executeQuery(String.format(
-                    "SELECT * FROM event WHERE id = %d", id));
+            preparedStatement = connection.prepareStatement("SELECT * FROM event WHERE id = ?");
+            preparedStatement.setInt(1, id);
+            resultSet = preparedStatement.executeQuery();
             resultSet.next();
             return new Event(resultSet.getInt("id"),
                     resultSet.getString("name"),
@@ -137,8 +149,8 @@ public class EventController {
 
     public ArrayList<Event> getExpiredEvents() {
         try {
-            statement = connection.createStatement();
-            resultSet = statement.executeQuery("SELECT * FROM event WHERE date < NOW()");
+            preparedStatement = connection.prepareStatement("SELECT * FROM event WHERE date < NOW()");
+            resultSet = preparedStatement.executeQuery();
             ArrayList<Event> events = new ArrayList<Event>();
             while (resultSet.next()) {
                 events.add(new Event(resultSet.getInt("id"),
@@ -158,8 +170,8 @@ public class EventController {
 
     public ArrayList<Event> getUpcomingEvents() {
         try {
-            statement = connection.createStatement();
-            resultSet = statement.executeQuery("SELECT * FROM event WHERE date > NOW()");
+            preparedStatement = connection.prepareStatement("SELECT * FROM event WHERE date > NOW()");
+            resultSet = preparedStatement.executeQuery();
             ArrayList<Event> events = new ArrayList<Event>();
             while (resultSet.next()) {
                 events.add(new Event(resultSet.getInt("id"),
@@ -179,8 +191,8 @@ public class EventController {
 
     public ArrayList<Event> getAllEvents() {
         try {
-            statement = connection.createStatement();
-            resultSet = statement.executeQuery("SELECT * FROM event");
+            preparedStatement = connection.prepareStatement("SELECT * FROM event");
+            resultSet = preparedStatement.executeQuery();
             ArrayList<Event> events = new ArrayList<Event>();
             while (resultSet.next()) {
                 events.add(new Event(resultSet.getInt("id"),
@@ -200,9 +212,9 @@ public class EventController {
 
     public boolean isEventFull(int id) {
         try {
-            statement = connection.createStatement();
-            resultSet = statement.executeQuery(String.format(
-                    "SELECT capacity, sold FROM event WHERE id = %d", id));
+            preparedStatement = connection.prepareStatement("SELECT capacity, sold FROM event WHERE id = ?");
+            preparedStatement.setInt(1, id);
+            resultSet = preparedStatement.executeQuery();
             return (resultSet.next()) ? resultSet.getInt("capacity") == resultSet.getInt("sold") : false;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -212,11 +224,10 @@ public class EventController {
 
     public boolean isEventExpired(int id) {
         try {
-            statement = connection.createStatement();
-            resultSet = statement.executeQuery(String.format(
-                    "SELECT date FROM event WHERE id = %d", id));
-            return (resultSet.next())
-                    ? resultSet.getTimestamp("date").before(new Timestamp(System.currentTimeMillis()))
+            preparedStatement = connection.prepareStatement("SELECT date FROM event WHERE id = ?");
+            preparedStatement.setInt(1, id);
+            resultSet = preparedStatement.executeQuery();
+            return (resultSet.next()) ? resultSet.getTimestamp("date").before(new Timestamp(System.currentTimeMillis()))
                     : false;
         } catch (SQLException e) {
             e.printStackTrace();

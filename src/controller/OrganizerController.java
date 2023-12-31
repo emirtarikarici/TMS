@@ -1,13 +1,13 @@
 package controller;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 
 public class OrganizerController {
     private Connection connection;
-    private Statement statement;
+    private PreparedStatement preparedStatement;
     private ResultSet resultSet;
     private AccountValidator accountValidator;
 
@@ -18,12 +18,13 @@ public class OrganizerController {
 
     public boolean changeUsername(String username, String newUsername) {
         try {
-            statement = connection.createStatement();
             if (!accountValidator.validateUsername(newUsername)) {
                 return false;
             } else {
-                statement.executeUpdate(String.format("UPDATE organizer SET username = '%s' WHERE username = '%s'",
-                        newUsername, username));
+                preparedStatement = connection.prepareStatement("UPDATE organizer SET username = ? WHERE username = ?");
+                preparedStatement.setString(1, newUsername);
+                preparedStatement.setString(2, username);
+                preparedStatement.executeUpdate();
                 return true;
             }
         } catch (Exception e) {
@@ -34,12 +35,13 @@ public class OrganizerController {
 
     public boolean changePassword(String username, String newPassword) {
         try {
-            statement = connection.createStatement();
             if (!accountValidator.validatePassword(newPassword)) {
                 return false;
             } else {
-                statement.executeUpdate(String.format("UPDATE organizer SET password = '%s' WHERE username = '%s'",
-                        newPassword, username));
+                preparedStatement = connection.prepareStatement("UPDATE organizer SET password = ? WHERE username = ?");
+                preparedStatement.setString(1, newPassword);
+                preparedStatement.setString(2, username);
+                preparedStatement.executeUpdate();
                 return true;
             }
         } catch (Exception e) {
@@ -50,9 +52,9 @@ public class OrganizerController {
 
     public double getBalance(String username) {
         try {
-            statement = connection.createStatement();
-            resultSet = statement
-                    .executeQuery(String.format("SELECT * FROM organizer WHERE username = '%s'", username));
+            preparedStatement = connection.prepareStatement("SELECT * FROM organizer WHERE username = ?");
+            preparedStatement.setString(1, username);
+            resultSet = preparedStatement.executeQuery();
             if (resultSet.next()) {
                 return resultSet.getDouble("balance");
             } else {
