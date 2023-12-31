@@ -52,20 +52,6 @@ public class UserController {
 
     public boolean addBalance(String username, double amount) {
         try {
-            /*
-             * statement = connection.createStatement();
-             * resultSet = statement.executeQuery(String.
-             * format("SELECT * FROM user WHERE username = '%s'", username));
-             * if (resultSet.next()) {
-             * double balance = resultSet.getDouble("balance");
-             * statement.executeUpdate(String.
-             * format("UPDATE user SET balance = %f WHERE username = '%s'",
-             * balance + amount, username));
-             * return true;
-             * } else {
-             * return false;
-             * }
-             */
             preparedStatement = connection.prepareStatement(("SELECT * FROM user WHERE username = ?"));
             preparedStatement.setString(1, username);
             resultSet = preparedStatement.executeQuery();

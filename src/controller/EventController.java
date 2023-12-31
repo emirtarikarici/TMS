@@ -40,17 +40,20 @@ public class EventController {
         }
     }
 
-    public int createEvent(String name, String organizerUsername, Timestamp date, String location, int capacity) {
+    public int createEvent(String name, String organizerUsername, Timestamp date, String location, int capacity,
+            double price) {
         try {
             if (this.validateEvent(date, location)) {
                 preparedStatement = connection.prepareStatement(
-                        "INSERT INTO event (name, organizerUsername, date, location, capacity) VALUES (?, ?, ?, ?, ?)",
+                        "INSERT INTO event (name, organizerUsername, date, location, capacity, sold, price) VALUES (?, ?, ?, ?, ?, ?, ?)",
                         Statement.RETURN_GENERATED_KEYS);
                 preparedStatement.setString(1, name);
                 preparedStatement.setString(2, organizerUsername);
                 preparedStatement.setTimestamp(3, date);
                 preparedStatement.setString(4, location);
                 preparedStatement.setInt(5, capacity);
+                preparedStatement.setInt(6, 0);
+                preparedStatement.setDouble(7, price);
                 preparedStatement.executeUpdate();
                 resultSet = preparedStatement.getGeneratedKeys();
                 return resultSet.next() ? resultSet.getInt(1) : -1;
@@ -64,16 +67,17 @@ public class EventController {
     }
 
     public boolean updateEvent(int eventId, String name, String organizerUsername, Timestamp date,
-            String location, int capacity) {
+            String location, int capacity, double price) {
         try {
             preparedStatement = connection.prepareStatement(
-                    "UPDATE event SET name = ?, organizerUsername = ?, date = ?, location = ?, capacity = ? WHERE id = ?");
+                    "UPDATE event SET name = ?, organizerUsername = ?, date = ?, location = ?, capacity = ?, price = ? WHERE id = ?");
             preparedStatement.setString(1, name);
             preparedStatement.setString(2, organizerUsername);
             preparedStatement.setTimestamp(3, date);
             preparedStatement.setString(4, location);
             preparedStatement.setInt(5, capacity);
             preparedStatement.setInt(6, eventId);
+            preparedStatement.setDouble(7, price);
             preparedStatement.executeUpdate();
             return true;
         } catch (SQLException e) {
@@ -96,7 +100,8 @@ public class EventController {
                         resultSet.getTimestamp("date"),
                         resultSet.getString("location"),
                         resultSet.getInt("capacity"),
-                        resultSet.getInt("sold")));
+                        resultSet.getInt("sold"),
+                        resultSet.getDouble("price")));
             }
             return events;
         } catch (SQLException e) {
@@ -119,7 +124,8 @@ public class EventController {
                         resultSet.getTimestamp("date"),
                         resultSet.getString("location"),
                         resultSet.getInt("capacity"),
-                        resultSet.getInt("sold")));
+                        resultSet.getInt("sold"),
+                        resultSet.getDouble("price")));
             }
             return events;
         } catch (SQLException e) {
@@ -140,7 +146,8 @@ public class EventController {
                     resultSet.getTimestamp("date"),
                     resultSet.getString("location"),
                     resultSet.getInt("capacity"),
-                    resultSet.getInt("sold"));
+                    resultSet.getInt("sold"),
+                    resultSet.getDouble("price"));
         } catch (SQLException e) {
             e.printStackTrace();
             return null;
@@ -159,7 +166,8 @@ public class EventController {
                         resultSet.getTimestamp("date"),
                         resultSet.getString("location"),
                         resultSet.getInt("capacity"),
-                        resultSet.getInt("sold")));
+                        resultSet.getInt("sold"),
+                        resultSet.getDouble("price")));
             }
             return events;
         } catch (SQLException e) {
@@ -180,7 +188,8 @@ public class EventController {
                         resultSet.getTimestamp("date"),
                         resultSet.getString("location"),
                         resultSet.getInt("capacity"),
-                        resultSet.getInt("sold")));
+                        resultSet.getInt("sold"),
+                        resultSet.getDouble("price")));
             }
             return events;
         } catch (SQLException e) {
@@ -201,7 +210,8 @@ public class EventController {
                         resultSet.getTimestamp("date"),
                         resultSet.getString("location"),
                         resultSet.getInt("capacity"),
-                        resultSet.getInt("sold")));
+                        resultSet.getInt("sold"),
+                        resultSet.getDouble("price")));
             }
             return events;
         } catch (SQLException e) {
