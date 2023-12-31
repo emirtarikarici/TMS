@@ -144,7 +144,7 @@ public class LoginPage extends JFrame{
                     textMessage.setText("Successfully login");
                     frmLoginpage.dispose();
                     if (loginController.getAccountType(usernameText)==RegisterController.USER){
-                        UserMainPage mPage = new UserMainPage();
+                        UserMainPage mPage = new UserMainPage(usernameText);
                     }
                     else if (loginController.getAccountType(usernameText)==RegisterController.ORGANIZER){
                         OrganizerMainPage oPage = new OrganizerMainPage();

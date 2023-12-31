@@ -1,50 +1,33 @@
 package view.user;
 
 
-import controller.DatabaseConnection;
-import controller.EventController;
+import controller.*;
 import view.LoginPage;
 
 import java.awt.EventQueue;
 
-import javax.swing.JFrame;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
+import javax.swing.*;
 import java.awt.FlowLayout;
-import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
-import javax.swing.JLabel;
 import java.awt.BorderLayout;
-import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JDesktopPane;
-import javax.swing.JPanel;
 import java.awt.GridLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
 
-import javax.swing.JRadioButton;
-import javax.swing.JScrollPane;
-import javax.swing.JMenuItem;
-import javax.swing.JPopupMenu;
 import java.awt.Component;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import javax.swing.JButton;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
-import javax.swing.JList;
-import javax.swing.JTable;
-import javax.swing.ListSelectionModel;
+
 import model.*;
 public class UserMainPage extends JFrame{
 
     private JFrame frame;
-
+    public String currentUsername;
     /**
      * Launch the application.
      */
@@ -52,7 +35,7 @@ public class UserMainPage extends JFrame{
         EventQueue.invokeLater(new Runnable() {
             public void run() {
                 try {
-                    UserMainPage window = new UserMainPage();
+                    UserMainPage window = new UserMainPage("Temp");
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -63,7 +46,8 @@ public class UserMainPage extends JFrame{
     /**
      * Create the application.
      */
-    public UserMainPage() {
+    public UserMainPage(String currentUsername) {
+        this.currentUsername = currentUsername;
         initialize();
     }
 
@@ -71,6 +55,9 @@ public class UserMainPage extends JFrame{
      * Initialize the contents of the frame.
      */
     private void initialize() {
+        TicketController ticketController = new TicketController(new DatabaseConnection().getConnection());
+        TransactionController transactionController = new TransactionController(new DatabaseConnection().getConnection());
+        UserController userController = new UserController(new DatabaseConnection().getConnection());
         frame = new JFrame("User Main Page");
         frame.setBounds(100, 100, 600, 500);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -91,7 +78,7 @@ public class UserMainPage extends JFrame{
             @Override
             public void mouseClicked(MouseEvent e) {
                 frame.dispose();
-                UserMainPage userMainPage = new UserMainPage();
+                UserMainPage userMainPage = new UserMainPage(currentUsername);
             }
         });
         menuButtonPanel.add(homeButton);
@@ -130,11 +117,11 @@ public class UserMainPage extends JFrame{
         menuPanel.add(menuTextPanel);
         menuTextPanel.setLayout(new GridLayout(1,0, 0, 0));
 
-        JLabel helloLabel = new JLabel("Hello Hüseyin Acemli");
+        JLabel helloLabel = new JLabel("Hello "+ currentUsername);
         helloLabel.setHorizontalAlignment(SwingConstants.CENTER);
         menuTextPanel.add(helloLabel);
 
-        JLabel balanceLabel = new JLabel("Balance");
+        JLabel balanceLabel = new JLabel("Balance: "+userController.getBalance(currentUsername)+ " TL" );
         balanceLabel.setHorizontalAlignment(SwingConstants.CENTER);
         menuTextPanel.add(balanceLabel);
 
@@ -163,12 +150,12 @@ public class UserMainPage extends JFrame{
         //Controller part
         EventController eventController = new EventController(new DatabaseConnection().getConnection()) ;
         ArrayList<Event> upcomingEventList =   eventController.getUpcomingEvents();
-        String col[] = {"ID","Name","Organizer","Date","Location","Capacity","Sold"};
+        String col[] = {"ID","Name","Organizer","Price","Date","Location","Capacity","Sold"};
         for (String colName: col){
             model.addColumn(colName);
         }
         for (Event event : upcomingEventList){
-            Object [] rowData = {event.getId(),event.getName(),event.getOrganizerUsername(),event.getDate(),event.getLocation(),event.getCapacity(),event.getSold()};
+            Object [] rowData = {event.getId(),event.getName(),event.getOrganizerUsername(),event.getPrice(),event.getDate(),event.getLocation(),event.getCapacity(),event.getSold()};
             model.addRow(rowData);
         }
 
@@ -219,6 +206,29 @@ public class UserMainPage extends JFrame{
         bookingButton.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
+                int selectedRow = table.getSelectedRow();
+                if (selectedRow == -1){
+                    JOptionPane.showMessageDialog(new JFrame(), "There is no selected event");
+                }
+                else{
+                    float price = 100;
+                    int eventId = (int)(table.getValueAt(selectedRow, 0));
+                    Event event = eventController.getEventById(eventId);
+                    int ticketId = ticketController.createTicket(currentUsername,eventId);
+                    int transactionId = transactionController.createTransaction(currentUsername,event.getOrganizerUsername(),ticketId);
+
+
+
+                    //refresh Page
+
+                    JOptionPane.showMessageDialog(new JFrame(), "Ticket is booked successfully.  ");
+                    frame.dispose();
+                    UserMainPage userMainPage = new UserMainPage(currentUsername);
+
+                }
+
+
+
             }
         });
 
@@ -231,9 +241,10 @@ public class UserMainPage extends JFrame{
                 model.setRowCount(0);
                 ArrayList<Event> upcomingEventList =   eventController.getUpcomingEvents();
                 for (Event event : upcomingEventList){
-                    Object [] rowData = {event.getId(),event.getName(),event.getOrganizerUsername(),event.getDate(),event.getLocation(),event.getCapacity(),event.getSold()};
+                    Object [] rowData = {event.getId(),event.getName(),event.getOrganizerUsername(),event.getPrice(),event.getDate(),event.getLocation(),event.getCapacity(),event.getSold()};
                     model.addRow(rowData);
                 }
+
             }
         });
         panelButton.add(refreshButton);
