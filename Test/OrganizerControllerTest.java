@@ -63,6 +63,7 @@ class OrganizerControllerTest {
             statement = connection.createStatement();
             controller.registerController.register("xxx", "111111", RegisterController.ORGANIZER);
             controller.registerController.register("yyy", "222222", RegisterController.USER);
+            controller.userController.addBalance("yyy", 100.5);
             int id = controller.eventController.createEvent("event","xxx", new Timestamp(System.currentTimeMillis()),"location",3);
             int ticket = controller.ticketController.createTicket("yyy",id, 10.0);
             controller.transactionController.createTransaction("yyy","xxx",10.0, ticket);
