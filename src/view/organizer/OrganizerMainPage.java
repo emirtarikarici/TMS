@@ -37,6 +37,10 @@ public class OrganizerMainPage extends JFrame {
 
         JLabel lblNewLabel = new JLabel("Organizer Main Page");
         contentPane.add(lblNewLabel);
+
+        setVisible(true);
+
+
     }
 
 }

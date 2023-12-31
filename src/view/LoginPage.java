@@ -1,5 +1,6 @@
 package view;
 
+
 import java.awt.EventQueue;
 import javax.swing.JFrame;
 import java.awt.GridLayout;
@@ -22,7 +23,7 @@ import view.organizer.OrganizerMainPage;
 import view.user.UserMainPage;
 
 import javax.swing.JComboBox;
-
+import controller.*;
 public class LoginPage extends JFrame{
 
     private static final long serialVersionUID = 1L;
@@ -137,52 +138,29 @@ public class LoginPage extends JFrame{
             public void mouseClicked(MouseEvent e) {
                 String usernameText = usernameField.getText();
                 String passwordText = passwordField.getText();
-                System.out.println(usernameText);
-                System.out.println(passwordText);
 
-                if(comboBox.getSelectedItem().equals("User")) {
-                    if (passwordText.equals("1")) {   // if (login(usernameText,passwordText))
-                        textMessage.setText("Successfully login");
-                        frmLoginpage.dispose();
-                        System.out.println("LOGIB BUTTON CLICKED, MOVING TO THE MAIN PAGE");
-                        try {
-                            UserMainPage mPage = new UserMainPage();
-                            mPage.setVisible(true);
-                        } catch (Exception e1) {
-                            e1.printStackTrace();
-                        }
+                LoginController loginController = new LoginController(new DatabaseConnection().getConnection());
+                if (loginController.login(usernameText,passwordText)) {
+                    textMessage.setText("Successfully login");
+                    frmLoginpage.dispose();
+                    if (loginController.getAccountType(usernameText)==RegisterController.USER){
+                        UserMainPage mPage = new UserMainPage();
+                    }
+                    else if (loginController.getAccountType(usernameText)==RegisterController.ORGANIZER){
+                        OrganizerMainPage oPage = new OrganizerMainPage();
                     }
 
 
-                    else {
-                        textMessage.setText("username or/and password are wrong!!!");
-
-                    }
+                } else {
+                    textMessage.setText("username or/and password are wrong!!!");
                 }
-
-                else {
-                    if (passwordText.equals("1")) {   // if (login(usernameText,passwordText))
-                        textMessage.setText("Successfully login");
-                        frmLoginpage.dispose();
-                        System.out.println("LOGIB BUTTON CLICKED, MOVING TO THE MAIN PAGE");
-                        try {
-                            OrganizerMainPage omPage = new OrganizerMainPage();
-                            omPage.setVisible(true);
-                        } catch (Exception e1) {
-                            e1.printStackTrace();
-                        }
-                    }
-
-
-                    else {
-                        textMessage.setText("username or/and password are wrong!!!");
-
-                    }
-                }
-
-
 
             }
+
+
+
+
+
         });
         panelButton.add(btnNewButton);
         panel.add(centerPanel);
@@ -197,18 +175,15 @@ public class LoginPage extends JFrame{
         btnNewButtonRegister.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                System.out.println("REGISTER BUTTON CLICKED, MOVING TO THE REGISTER PAGE");
                 frmLoginpage.dispose();
-                try {
-                    RegisterPage registerPage = new RegisterPage();
-                    registerPage.setVisible(true);
-                } catch (Exception e1) {
-                    e1.printStackTrace();
-                }
+                RegisterPage registerPage = new RegisterPage();
+
             }
         });
 
 
         panelButton.add(btnNewButtonRegister);
+
+        frmLoginpage.setVisible(true);
     }
 }

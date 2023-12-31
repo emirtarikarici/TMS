@@ -9,6 +9,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.sql.Connection;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -18,6 +19,9 @@ import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
+import controller.*;
+import view.organizer.OrganizerMainPage;
+import view.user.UserMainPage;
 
 public class RegisterPage extends JFrame {
 
@@ -85,19 +89,34 @@ public class RegisterPage extends JFrame {
         JButton registerButton = new JButton("Register");
         JButton cancelButton = new JButton("Cancel");
 
-        cancelButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
+        registerButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {  // Register button
+                String userType = userTypeComboBox.getSelectedItem().toString();;
+                String usernameText = ((JTextField) fieldsPanel.getComponent(1)).getText();
+                char[] passwordChars = ((JPasswordField) fieldsPanel.getComponent(3)).getPassword();
+                String passwordText = new String(passwordChars);
+                if (userType.equals("User")){
+                    if (new RegisterController(new DatabaseConnection().getConnection()).register(usernameText,passwordText,RegisterController.USER)){
+                        dispose();
+                        LoginPage loginPage = new LoginPage();
+                    }
+                }
+                else{
+                    if(new RegisterController(new DatabaseConnection().getConnection()).register(usernameText,passwordText,RegisterController.ORGANIZER)){
+                        dispose();
+                        LoginPage loginPage = new LoginPage();
+                    }
+                }
+
             }
 
         });
         cancelButton.addMouseListener(new MouseAdapter() {
             @Override
-            public void mouseClicked(MouseEvent e) {
-                System.out.println("CANCEL BUTTON CLICKED, MOVING ON TO THE LOGIN PAGE");
+            public void mouseClicked(MouseEvent e) {  //Cancel button
                 dispose();
                 try {
                     LoginPage loginPage = new LoginPage();
-                    loginPage.frmLoginpage.setVisible(true);
                 } catch (Exception e1) {
                     e1.printStackTrace();
                 }
@@ -108,5 +127,7 @@ public class RegisterPage extends JFrame {
         panelSouth.add(cancelButton);
 
         contentPane.add(panelSouth, BorderLayout.SOUTH);
+
+        setVisible(true);
     }
 }
