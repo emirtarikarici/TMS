@@ -1,9 +1,12 @@
 import controller.RegisterController;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class RegisterControllerTest {
     private Connection connection;
@@ -19,5 +22,11 @@ public class RegisterControllerTest {
     void tearDown() throws Exception {
         Main.dropAllTables(connection);
         connection.close();
+    }
+
+    @Test
+    public void shouldReturnFalseWhenUsernameExists() throws Exception {
+        registerController.register("existingUser", "password", RegisterController.USER);
+        assertFalse(registerController.register("existingUser", "password", RegisterController.USER));
     }
 }
