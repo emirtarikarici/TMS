@@ -1,15 +1,15 @@
 package controller;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.Statement;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
 public class LoginController {
     private Connection connection;
-    private Statement statement;
+    private PreparedStatement preparedStatement;
     private ResultSet resultSet;
     private boolean isLoggedIn;
 
@@ -19,10 +19,13 @@ public class LoginController {
 
     public boolean login(String username, String password) {
         try {
-            statement = connection.createStatement();
-            resultSet = statement.executeQuery(String.format(
-                    "(SELECT * FROM user WHERE username = '%s' AND password = '%s') UNION (SELECT * FROM organizer WHERE username = '%s' AND password = '%s')",
-                    username, password, username, password));
+            preparedStatement = connection.prepareStatement(
+                    "(SELECT * FROM user WHERE username = ? AND password = ?) UNION (SELECT * FROM organizer WHERE username = ? AND password = ?)");
+            preparedStatement.setString(1, username);
+            preparedStatement.setString(2, password);
+            preparedStatement.setString(3, username);
+            preparedStatement.setString(4, password);
+            resultSet = preparedStatement.executeQuery();
             if (resultSet.next()) {
                 if (!password.equals(resultSet.getString("password"))) {
                     JOptionPane.showMessageDialog(new JFrame(), "Password is incorrect!");
@@ -47,5 +50,29 @@ public class LoginController {
 
     public boolean isLoggedIn() {
         return this.isLoggedIn;
+    }
+
+    public int getAccountType(String username) {
+        try {
+            preparedStatement = connection.prepareStatement("SELECT * FROM user WHERE username = ?");
+            preparedStatement.setString(1, username);
+            resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                return RegisterController.USER;
+            } else {
+                preparedStatement = connection.prepareStatement("SELECT * FROM organizer WHERE username = ?");
+                preparedStatement.setString(1, username);
+                resultSet = preparedStatement.executeQuery();
+                if (resultSet.next()) {
+                    return RegisterController.ORGANIZER;
+                } else {
+                    System.out.println("User does not exist!");
+                    return -1;
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return -1;
+        }
     }
 }

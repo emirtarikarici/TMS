@@ -1,6 +1,7 @@
 package controller;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
@@ -9,21 +10,23 @@ import model.Ticket;
 
 public class TicketController {
     private Connection connection;
-    private Statement statement;
+    private PreparedStatement preparedStatement;
     private ResultSet resultSet;
 
     public TicketController(Connection connection) {
         this.connection = connection;
     }
 
-    public int createTicket(String userUsername, int eventId, double price) {
+    public int createTicket(String userUsername, int eventId) {
         try {
-            statement = connection.createStatement();
-            statement.executeUpdate(
-                    String.format("INSERT INTO ticket (userUsername, eventId, price) VALUES ('%s', %d, %f)",
-                            userUsername, eventId, price),
+            preparedStatement = connection.prepareStatement(
+                    "INSERT INTO ticket (userUsername, eventId, status) VALUES (?, ?, ?)",
                     Statement.RETURN_GENERATED_KEYS);
-            resultSet = statement.getGeneratedKeys();
+            preparedStatement.setString(1, userUsername);
+            preparedStatement.setInt(2, eventId);
+            preparedStatement.setInt(3, Ticket.ACTIVE);
+            preparedStatement.executeUpdate();
+            resultSet = preparedStatement.getGeneratedKeys();
             return resultSet.next() ? resultSet.getInt(1) : -1;
         } catch (Exception e) {
             e.printStackTrace();
@@ -31,38 +34,15 @@ public class TicketController {
         }
     }
 
-    public boolean deleteTicketById(int id) {
-        try {
-            statement = connection.createStatement();
-            statement.executeUpdate(String.format("DELETE FROM ticket WHERE id = %d", id));
-            return true;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-
-    public boolean deleteTicketByUsernameAndEventId(String userUsername, int eventId) {
-        try {
-            statement = connection.createStatement();
-            statement.executeUpdate(String.format("DELETE FROM ticket WHERE userUsername = '%s' AND eventId = %d",
-                    userUsername, eventId));
-            return true;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-
     public ArrayList<Ticket> getTicketsByUsername(String userUsername) {
         try {
-            statement = connection.createStatement();
-            resultSet = statement.executeQuery(String.format("SELECT * FROM ticket WHERE userUsername = '%s'",
-                    userUsername));
+            preparedStatement = connection.prepareStatement("SELECT * FROM ticket WHERE userUsername = ?");
+            preparedStatement.setString(1, userUsername);
+            resultSet = preparedStatement.executeQuery();
             ArrayList<Ticket> tickets = new ArrayList<Ticket>();
             while (resultSet.next()) {
                 tickets.add(new Ticket(resultSet.getInt("id"), resultSet.getString("userUsername"),
-                        resultSet.getInt("eventId"), resultSet.getDouble("price")));
+                        resultSet.getInt("eventId"), resultSet.getInt("status")));
             }
             return tickets;
         } catch (Exception e) {
@@ -73,12 +53,13 @@ public class TicketController {
 
     public ArrayList<Ticket> getTicketsByEventId(int eventId) {
         try {
-            statement = connection.createStatement();
-            resultSet = statement.executeQuery(String.format("SELECT * FROM ticket WHERE eventId = %d", eventId));
+            preparedStatement = connection.prepareStatement("SELECT * FROM ticket WHERE eventId = ?");
+            preparedStatement.setInt(1, eventId);
+            resultSet = preparedStatement.executeQuery();
             ArrayList<Ticket> tickets = new ArrayList<Ticket>();
             while (resultSet.next()) {
                 tickets.add(new Ticket(resultSet.getInt("id"), resultSet.getString("userUsername"),
-                        resultSet.getInt("eventId"), resultSet.getDouble("price")));
+                        resultSet.getInt("eventId"), resultSet.getInt("status")));
             }
             return tickets;
         } catch (Exception e) {
@@ -89,12 +70,12 @@ public class TicketController {
 
     public ArrayList<Ticket> getAllTickets() {
         try {
-            statement = connection.createStatement();
-            resultSet = statement.executeQuery("SELECT * FROM ticket");
+            preparedStatement = connection.prepareStatement("SELECT * FROM ticket");
+            resultSet = preparedStatement.executeQuery();
             ArrayList<Ticket> tickets = new ArrayList<Ticket>();
             while (resultSet.next()) {
                 tickets.add(new Ticket(resultSet.getInt("id"), resultSet.getString("userUsername"),
-                        resultSet.getInt("eventId"), resultSet.getDouble("price")));
+                        resultSet.getInt("eventId"), resultSet.getInt("status")));
             }
             return tickets;
         } catch (Exception e) {
@@ -105,11 +86,12 @@ public class TicketController {
 
     public Ticket getTicketById(int id) {
         try {
-            statement = connection.createStatement();
-            resultSet = statement.executeQuery(String.format("SELECT * FROM ticket WHERE id = %d", id));
+            preparedStatement = connection.prepareStatement("SELECT * FROM ticket WHERE id = ?");
+            preparedStatement.setInt(1, id);
+            resultSet = preparedStatement.executeQuery();
             if (resultSet.next()) {
                 return new Ticket(resultSet.getInt("id"), resultSet.getString("userUsername"),
-                        resultSet.getInt("eventId"), resultSet.getDouble("price"));
+                        resultSet.getInt("eventId"), resultSet.getInt("status"));
             } else {
                 return null;
             }

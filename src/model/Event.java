@@ -10,9 +10,10 @@ public class Event {
     private String location;
     private int capacity;
     private int sold;
+    private double price;
 
     public Event(int id, String name, String organizerUsername, Timestamp date, String location, int capacity,
-            int sold) {
+            int sold, double price) {
         this.id = id;
         this.name = name;
         this.organizerUsername = organizerUsername;
@@ -20,6 +21,7 @@ public class Event {
         this.location = location;
         this.capacity = capacity;
         this.sold = sold;
+        this.price = price;
     }
 
     public int getId() {
@@ -50,18 +52,23 @@ public class Event {
         return this.sold;
     }
 
+    public double getPrice() {
+        return this.price;
+    }
+
     public boolean equals(Event event) {
         return this.id == event.id && this.name.equals(event.getName())
                 && this.organizerUsername.equals(event.getOrganizerUsername())
                 && this.date.equals(event.getDate()) && this.location.equals(event.getLocation())
-                && this.capacity == event.getCapacity() && this.sold == event.getSold();
+                && this.capacity == event.getCapacity() && this.sold == event.getSold()
+                && this.price == event.getPrice();
     }
 
     @Override
     public int hashCode() {
         return this.id + this.name.hashCode() + this.organizerUsername.hashCode() + this.date.hashCode()
                 + this.location.hashCode()
-                + this.capacity + this.sold;
+                + this.capacity + this.sold + (int) this.price;
     }
 
 }

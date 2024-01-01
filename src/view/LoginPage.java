@@ -115,9 +115,6 @@ public class LoginPage extends JFrame{
         JPanel panel_6 = new JPanel();
         centerPanel.add(panel_6);
 
-        JComboBox<String> comboBox = new JComboBox<>(new String[]{"Organizer", "User"});
-        panel_6.add(comboBox);
-
         JPanel panelMessage = new JPanel();
         centerPanel.add(panelMessage);
 
@@ -147,7 +144,7 @@ public class LoginPage extends JFrame{
                         UserMainPage mPage = new UserMainPage(usernameText);
                     }
                     else if (loginController.getAccountType(usernameText)==RegisterController.ORGANIZER){
-                        OrganizerMainPage oPage = new OrganizerMainPage();
+                        OrganizerMainPage oPage = new OrganizerMainPage(usernameText);
                     }
 
 
