@@ -237,19 +237,25 @@ public class ProfilePage {
                 char[] newPass1 = newpasswordField.getPassword();
                 char[] newPass2 = confnewpasswordField.getPassword();
                 String oldPassword = new String(oldpasswordField.getPassword());
-                if (Arrays.equals(newPass1, newPass2)){
-                    if(userController.changePassword(username,new String(newPass1))){
-                        JOptionPane.showMessageDialog(new JFrame(), "Password is changed successfully");
-                        changePasswordDialog.dispose();
-                        mainFrame.dispose();
-                        new ProfilePage(username);
-                    }
-                    else{
-                        JOptionPane.showMessageDialog(new JFrame(), "Requirements not met!!!");
+                if (oldPassword.equals(userController.getUserByUsername(username).getPassword())){
+                    if (Arrays.equals(newPass1, newPass2)){
+                        if(userController.changePassword(username,new String(newPass1))){
+                            JOptionPane.showMessageDialog(new JFrame(), "Password is changed successfully");
+                            changePasswordDialog.dispose();
+                            mainFrame.dispose();
+                            new ProfilePage(username);
+                        }
+                        else{
+                            JOptionPane.showMessageDialog(new JFrame(), "Requirements not met!!!");
+                        }
+
+                    }else{
+                        JOptionPane.showMessageDialog(new JFrame(), "Passwords not matching!!!");
                     }
 
-                }else{
-                    JOptionPane.showMessageDialog(new JFrame(), "Passwords not matching!!!");
+                }
+                else{
+                    JOptionPane.showMessageDialog(new JFrame(), "Old password is wrong!!!");
                 }
 
 
@@ -310,20 +316,26 @@ public class ProfilePage {
                 String newUsername1 = newUsernameField.getText();
                 String newUsername2 = confnewusernameField.getText();
                 String oldPassword = new String(oldpasswordField.getPassword());
-                if ((newUsername1.equals(newUsername2)) ){
-                    if(userController.changeUsername(username,newUsername1)){
-                        JOptionPane.showMessageDialog(new JFrame(), "Username is changed successfully");
-                        changeUsernameDialog.dispose();
-                        mainFrame.dispose();
-                        new ProfilePage(newUsername1);
-                    }
-                    else{
-                        JOptionPane.showMessageDialog(new JFrame(), "Requirements not met!!!");
-                    }
+                if (oldPassword.equals(userController.getUserByUsername(username).getPassword())){
+                    if ((newUsername1.equals(newUsername2)) ){
+                        if(userController.changeUsername(username,newUsername1)){
+                            JOptionPane.showMessageDialog(new JFrame(), "Username is changed successfully");
+                            changeUsernameDialog.dispose();
+                            mainFrame.dispose();
+                            new ProfilePage(newUsername1);
+                        }
+                        else{
+                            JOptionPane.showMessageDialog(new JFrame(), "Requirements not met!!!");
+                        }
 
-                }else{
-                    JOptionPane.showMessageDialog(new JFrame(), "Usernames not matching!!!");
+                    }else{
+                        JOptionPane.showMessageDialog(new JFrame(), "Usernames not matching!!!");
+                    }
                 }
+                else{
+                    JOptionPane.showMessageDialog(new JFrame(), "Password is wrong!!!");
+                }
+
 
 
 
