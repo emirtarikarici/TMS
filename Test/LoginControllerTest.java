@@ -70,4 +70,13 @@ public class LoginControllerTest {
         String nullPassword = null;
         Assertions.assertFalse(loginController.login(nullUsername, nullPassword));
     }
+
+    @Test
+    void logoutAfterLoginChangesLoginStatus() throws Exception {
+        String validUsername = "validUser";
+        String validPassword = "validPass";
+        loginController.login(validUsername, validPassword);
+        loginController.logout();
+        Assertions.assertFalse(loginController.isLoggedIn());
+    }
 }
