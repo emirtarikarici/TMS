@@ -2,6 +2,7 @@ package view;
 
 
 import controller.*;
+import view.organizer.OrganizerMainPage;
 import view.user.UserMainPage;
 
 import java.awt.*;
@@ -51,6 +52,8 @@ public class ProfilePage {
     private void initialize() {
         loginController = new LoginController(new DatabaseConnection().getConnection());
         userController = new UserController(new DatabaseConnection().getConnection());
+        int userTypeInt = loginController.getAccountType(currentUsername);
+
         frame = new JFrame("Profile Page");
         frame.setBounds(100, 100, 600, 500);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -71,7 +74,13 @@ public class ProfilePage {
             @Override
             public void mouseClicked(MouseEvent e) {
                 frame.dispose();
-                UserMainPage userMainPage = new UserMainPage(currentUsername);
+                if(userTypeInt == RegisterController.USER){
+                    UserMainPage userMainPage = new UserMainPage(currentUsername);
+                }
+                else{
+                    //OrganizerMainPage organizerMainPage = new (currentUsername);
+                }
+
 
             }
         });
