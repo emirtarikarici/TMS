@@ -76,8 +76,8 @@ public class EventController {
             preparedStatement.setTimestamp(3, date);
             preparedStatement.setString(4, location);
             preparedStatement.setInt(5, capacity);
-            preparedStatement.setInt(6, eventId);
-            preparedStatement.setDouble(7, price);
+            preparedStatement.setDouble(6, price);
+            preparedStatement.setInt(7, eventId);
             preparedStatement.executeUpdate();
             return true;
         } catch (SQLException e) {
