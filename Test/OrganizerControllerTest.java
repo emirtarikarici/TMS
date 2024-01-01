@@ -64,10 +64,10 @@ class OrganizerControllerTest {
             controller.registerController.register("xxx", "111111", RegisterController.ORGANIZER);
             controller.registerController.register("yyy", "222222", RegisterController.USER);
             controller.userController.addBalance("yyy", 100.5);
-            int id = controller.eventController.createEvent("event","xxx", new Timestamp(System.currentTimeMillis()),"location",3);
-            int ticket = controller.ticketController.createTicket("yyy",id, 10.0);
-            controller.transactionController.createTransaction("yyy","xxx",10.0, ticket);
-            assertEquals(controller.organizerController.getBalance("xxx"),10.0);
+            int id = controller.eventController.createEvent("event","xxx", new Timestamp(System.currentTimeMillis()),"location",3,20.30);
+            int ticket = controller.ticketController.createTicket("yyy",id);
+            controller.transactionController.createTransaction("yyy","xxx",ticket);
+            assertEquals(controller.organizerController.getBalance("xxx"),20.30);
         } catch (SQLException e) {
             e.printStackTrace();
         }
