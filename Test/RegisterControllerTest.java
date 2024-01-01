@@ -1,10 +1,12 @@
+import controller.Controller;
+import controller.DatabaseConnection;
 import controller.RegisterController;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
+
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -14,7 +16,8 @@ public class RegisterControllerTest {
 
     @BeforeEach
     public void setUp() throws Exception {
-        connection = DriverManager.getConnection("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1");
+        this.connection = new DatabaseConnection().getConnection();
+        Controller controller = new Controller(connection);
         registerController = new RegisterController(connection);
     }
 
