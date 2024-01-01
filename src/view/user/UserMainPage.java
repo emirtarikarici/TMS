@@ -2,30 +2,27 @@ package view.user;
 
 
 import controller.*;
+import model.Event;
 import view.LoginPage;
 
-import java.awt.EventQueue;
+import java.awt.*;
 
 import javax.swing.*;
-import java.awt.FlowLayout;
 import javax.swing.GroupLayout.Alignment;
-import java.awt.BorderLayout;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
-import java.awt.GridLayout;
-import java.awt.CardLayout;
-import java.awt.Color;
 
-import java.awt.Component;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import model.*;
 import view.ProfilePage;
-
+import java.text.DecimalFormat;
+import javax.swing.text.NumberFormatter;
 public class UserMainPage extends JFrame{
 
     private JFrame frame;
@@ -114,9 +111,6 @@ public class UserMainPage extends JFrame{
         });
         menuButtonPanel.add(logoutButton);
 
-
-
-
         JButton exitButton = new JButton("Exit");
         exitButton.addMouseListener(new MouseAdapter() {
             @Override
@@ -134,6 +128,33 @@ public class UserMainPage extends JFrame{
         JLabel helloLabel = new JLabel("Hello "+ currentUsername);
         helloLabel.setHorizontalAlignment(SwingConstants.CENTER);
         menuTextPanel.add(helloLabel);
+
+
+        JPanel tempPanel = new JPanel();
+        tempPanel.setLayout(new GridLayout(0, 3, 0, 0));
+        tempPanel.add(new JLabel());
+        tempPanel.add(new JLabel());
+
+
+        JButton addBalanceButton = new JButton("Add Balance");
+        addBalanceButton.setHorizontalAlignment(SwingConstants.CENTER);
+        addBalanceButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                JDialog addBalanceWindowFrame = addBalanceWindow(currentUsername,frame);
+                addBalanceWindowFrame.setVisible(true);
+
+
+            }
+        });
+        tempPanel.add(addBalanceButton);
+
+
+
+        menuTextPanel.add(tempPanel);
+
+
+
 
         JLabel balanceLabel = new JLabel("Balance: "+userController.getBalance(currentUsername)+ " TL" );
         balanceLabel.setHorizontalAlignment(SwingConstants.CENTER);
@@ -499,6 +520,77 @@ public class UserMainPage extends JFrame{
         panelButton.add(refreshButton);
         return tablePanel;
     }
+
+    public JDialog addBalanceWindow(String username, JFrame mainFrame) {
+        JDialog addBalanceDialog= new JDialog(new JFrame(), "Add Balance", true);
+        addBalanceDialog.setSize(500, 200);
+        addBalanceDialog.setResizable(false);
+        addBalanceDialog.setLocationRelativeTo(null);
+        addBalanceDialog.getContentPane().setLayout(new BorderLayout(0, 0));
+
+        JPanel panel = new JPanel();
+        addBalanceDialog.getContentPane().add(panel);
+        panel.setLayout(new GridLayout(0, 2, 10, 10));
+
+        JLabel addBalanceLabel = new JLabel("Add Balance");
+        addBalanceLabel.setHorizontalAlignment(SwingConstants.RIGHT);
+        addBalanceLabel.setFont(new Font("Tahoma", Font.PLAIN, 18));
+        panel.add(addBalanceLabel);
+
+
+
+
+        // Create a NumberFormatter with a Double class
+        NumberFormatter formatter = new NumberFormatter(new DecimalFormat("#0.00"));
+        formatter.setValueClass(Double.class);
+        formatter.setMinimum(0.0);  // Optional: Set minimum value
+        formatter.setMaximum(Double.MAX_VALUE);  // Optional: Set maximum value
+        formatter.setAllowsInvalid(false);  // Disallow invalid input
+        JFormattedTextField addBalanceField = new JFormattedTextField(formatter);
+        addBalanceField.setColumns(10);
+        addBalanceField.setValue(10.0);
+        panel.add(addBalanceField);
+
+        panel.add(new JLabel());
+        panel.add(new JLabel());
+
+
+        JCheckBox checkBox = new JCheckBox("Are you sure to add balance?");
+        panel.add(checkBox);
+
+
+        JPanel panel_2 = new JPanel();
+        addBalanceDialog.getContentPane().add(panel_2, BorderLayout.SOUTH);
+        JButton acceptBalance = new JButton("Change Password");
+        acceptBalance.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (checkBox.isSelected()){
+                    double amount= (Double) addBalanceField.getValue();
+                    if (amount >= 10){
+                        userController.addBalance(username,amount);
+                        String message = amount + "$ is added to your account";
+                        JOptionPane.showMessageDialog(new JFrame(), message);
+                        addBalanceDialog.dispose();
+                        mainFrame.dispose();
+                        new UserMainPage(username);
+
+                    }
+                    else{
+                        JOptionPane.showMessageDialog(new JFrame(), "Minimum amount is 10 $");
+                    }
+
+                }else{
+                    JOptionPane.showMessageDialog(new JFrame(), "Check box is not marked!!!");
+                }
+            }
+        });
+
+        panel_2.add(acceptBalance);
+
+        return addBalanceDialog;
+    }
+
 
 
 }
