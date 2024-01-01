@@ -72,14 +72,14 @@ public class DatabaseConnection {
                     "`capacity` INT NOT NULL," +
                     "`sold` INT DEFAULT 0, " +
                     "`price` DOUBLE NOT NULL," +
-                    "FOREIGN KEY (`organizerUsername`) REFERENCES `organizer`(`username`))");
+                    "FOREIGN KEY (`organizerUsername`) REFERENCES `organizer`(`username`) ON UPDATE CASCADE)");
 
             statement.executeUpdate("CREATE TABLE IF NOT EXISTS `ticket` (" +
                     "`id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY," +
                     "`userUsername` VARCHAR(255) NOT NULL," +
                     "`eventId` INT NOT NULL," +
                     "`status` INT NOT NULL," +
-                    "FOREIGN KEY (`userUsername`) REFERENCES `user`(`username`)," +
+                    "FOREIGN KEY (`userUsername`) REFERENCES `user`(`username`) ON UPDATE CASCADE," +
                     "FOREIGN KEY (`eventId`) REFERENCES `event`(`id`))");
 
             statement.executeUpdate("CREATE TABLE IF NOT EXISTS `transaction` (" +
@@ -89,8 +89,8 @@ public class DatabaseConnection {
                     "`amount` DOUBLE NOT NULL," +
                     "`status` INT NOT NULL," +
                     "`ticketId` INT NOT NULL," +
-                    "FOREIGN KEY (`userUsername`) REFERENCES `user`(`username`)," +
-                    "FOREIGN KEY (`organizerUsername`) REFERENCES `organizer`(`username`)," +
+                    "FOREIGN KEY (`userUsername`) REFERENCES `user`(`username`) ON UPDATE CASCADE," +
+                    "FOREIGN KEY (`organizerUsername`) REFERENCES `organizer`(`username`) ON UPDATE CASCADE," +
                     "FOREIGN KEY (`ticketId`) REFERENCES `ticket`(`id`))");
         } catch (SQLException e) {
             e.printStackTrace();
