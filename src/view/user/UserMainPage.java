@@ -1,6 +1,11 @@
 package view.user;
 
-
+import javax.swing.table.DefaultTableCellRenderer;
+import java.awt.Color;
+import java.awt.Component;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 import controller.*;
 import model.Event;
 import view.LoginPage;
@@ -23,6 +28,7 @@ import model.*;
 import view.ProfilePage;
 import java.text.DecimalFormat;
 import javax.swing.text.NumberFormatter;
+import java.sql.Timestamp;
 public class UserMainPage extends JFrame{
 
     private JFrame frame;
@@ -206,12 +212,14 @@ public class UserMainPage extends JFrame{
 
         //Controller part
 
+        ColorRenderer renderer = new ColorRenderer();
 
         String col[] = {"TicketID","Event Name","Price","Date","Location","Status"};
         for (String colName: col){
             model.addColumn(colName);
         }
         ArrayList<Ticket> ticketArrayList =   ticketController.getTicketsByUsername(currentUsername);
+        int rowCursor = 0;
         for (Ticket ticket : ticketArrayList){
             Event event = eventController.getEventById(ticket.getEventId());
 
@@ -223,10 +231,19 @@ public class UserMainPage extends JFrame{
                 status = "Cancelled";
             }
             Object [] rowData = {ticket.getTicketNumber(),event.getName(),event.getPrice(),event.getDate(),event.getLocation(),status};
+            if (event.getDate().before(new Timestamp(System.currentTimeMillis()))){
+                renderer.setColorForCell(rowCursor, 3, Color.RED);
+            }
+            else {
+                renderer.setColorForCell(rowCursor, 3, Color.GREEN);
+            }
+
+            rowCursor +=1;
             model.addRow(rowData);
         }
 
         JTable table = new JTable(model);
+        table.setDefaultRenderer(Object.class, renderer);
         table.setFocusable(false);
 
         //row selection active
@@ -591,6 +608,25 @@ public class UserMainPage extends JFrame{
         return addBalanceDialog;
     }
 
+    private static class ColorRenderer extends DefaultTableCellRenderer {
+        private final Map<String, Color> colorMap = new HashMap<>();
 
+        @Override
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row,
+                                                       int column) {
+            setBackground(null);
+            super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+            getColorForCell(row, column).ifPresent(this::setBackground);
+            return this;
+        }
+
+        public void setColorForCell(int row, int col, Color color) {
+            colorMap.put(row + ":" + col, color);
+        }
+
+        public Optional<Color> getColorForCell(int row, int col) {
+            return Optional.ofNullable(colorMap.get(row + ":" + col));
+        }
+    }
 
 }
