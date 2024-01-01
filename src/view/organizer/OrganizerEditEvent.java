@@ -4,6 +4,7 @@ import controller.*;
 import model.Event;
 import model.Ticket;
 import view.LoginPage;
+import view.ProfilePage;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -83,6 +84,13 @@ public class OrganizerEditEvent extends JFrame {
         menuButtonPanel.add(eventsButton);
 
         JButton profileButton = new JButton("Profile");
+        profileButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                frame.dispose();
+                ProfilePage Lwindow = new ProfilePage(currentUsername);
+            }
+        });
         menuButtonPanel.add(profileButton);
 
         JButton logoutButton = new JButton("Logout");

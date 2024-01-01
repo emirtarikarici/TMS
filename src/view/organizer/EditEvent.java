@@ -4,6 +4,7 @@ import controller.DatabaseConnection;
 import controller.EventController;
 import controller.OrganizerController;
 import view.LoginPage;
+import view.ProfilePage;
 
 import javax.swing.*;
 import java.awt.*;
@@ -79,6 +80,13 @@ public class EditEvent extends JFrame {
         menuButtonPanel.add(eventsButton);
 
         JButton profileButton = new JButton("Profile");
+        profileButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                frame.dispose();
+                ProfilePage Lwindow = new ProfilePage(currentUsername);
+            }
+        });
         menuButtonPanel.add(profileButton);
 
         JButton logoutButton = new JButton("Logout");

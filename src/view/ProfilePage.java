@@ -2,6 +2,7 @@ package view;
 
 
 import controller.*;
+import view.organizer.OrganizerEventsPage;
 import view.organizer.OrganizerMainPage;
 import view.user.UserMainPage;
 
@@ -90,8 +91,20 @@ public class ProfilePage {
         });
         menuButtonPanel.add(homeButton);
 
-        JButton historyButton = new JButton("History");
-        menuButtonPanel.add(historyButton);
+
+        if(userTypeInt == RegisterController.ORGANIZER){
+            JButton eventsButton = new JButton("Events");
+
+            eventsButton.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    frame.dispose();
+                    OrganizerEventsPage organizerEventsPage = new OrganizerEventsPage(currentUsername);
+                }
+            });
+
+            menuButtonPanel.add(eventsButton);
+        }
 
         JButton profileButton = new JButton("Profile");
         profileButton.addMouseListener(new MouseAdapter() {
@@ -134,7 +147,8 @@ public class ProfilePage {
         helloLabel.setHorizontalAlignment(SwingConstants.CENTER);
         menuTextPanel.add(helloLabel);
 
-        JLabel balanceLabel = new JLabel("Balance: "+userController.getBalance(currentUsername)+ " TL" );
+        double currentBalance  = (userTypeInt == RegisterController.USER) ? userController.getBalance(currentUsername) : organizerController.getBalance(currentUsername);
+        JLabel balanceLabel = new JLabel("Balance: "+currentBalance+ " TL" );
         balanceLabel.setHorizontalAlignment(SwingConstants.CENTER);
         menuTextPanel.add(balanceLabel);
 
@@ -150,7 +164,7 @@ public class ProfilePage {
         usernameText.setHorizontalAlignment(SwingConstants.CENTER);
         centerPanel.add(usernameText);
 
-        JLabel balanceText = new JLabel("Balance: " + userController.getBalance(currentUsername));
+        JLabel balanceText = new JLabel("Balance: " + currentBalance);
         balanceText.setFont(new Font("Tahoma", Font.BOLD, 31));
         balanceText.setHorizontalAlignment(SwingConstants.CENTER);
         centerPanel.add(balanceText);
