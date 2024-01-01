@@ -24,6 +24,8 @@ import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 
 import model.*;
+import view.ProfilePage;
+
 public class UserMainPage extends JFrame{
 
     private JFrame frame;
@@ -87,10 +89,17 @@ public class UserMainPage extends JFrame{
         menuButtonPanel.add(historyButton);
 
         JButton profileButton = new JButton("Profile");
+        profileButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                frame.dispose();
+                ProfilePage profilePage = new ProfilePage(currentUsername);
+            }
+        });
         menuButtonPanel.add(profileButton);
 
-        JButton logoutButton = new JButton("Logout");
 
+        JButton logoutButton = new JButton("Logout");
         logoutButton.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -220,10 +229,12 @@ public class UserMainPage extends JFrame{
 
 
                     //refresh Page
+                    if (transactionId != -1){
+                        JOptionPane.showMessageDialog(new JFrame(), "Ticket is booked successfully.  ");
+                        frame.dispose();
+                        UserMainPage userMainPage = new UserMainPage(currentUsername);
+                    }
 
-                    JOptionPane.showMessageDialog(new JFrame(), "Ticket is booked successfully.  ");
-                    frame.dispose();
-                    UserMainPage userMainPage = new UserMainPage(currentUsername);
 
                 }
 

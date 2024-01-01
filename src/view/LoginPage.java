@@ -134,8 +134,7 @@ public class LoginPage extends JFrame{
             @Override
             public void mouseClicked(MouseEvent e) {
                 String usernameText = usernameField.getText();
-                String passwordText = passwordField.getText();
-
+                String passwordText = new String(passwordField.getPassword());
                 LoginController loginController = new LoginController(new DatabaseConnection().getConnection());
                 if (loginController.login(usernameText,passwordText)) {
                     textMessage.setText("Successfully login");
