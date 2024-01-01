@@ -11,7 +11,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 
-public class OrganizerEventsPage extends JFrame {
+public class OrganizerDeleteEvent extends JFrame {
 
     private JFrame frame;
 
@@ -21,7 +21,7 @@ public class OrganizerEventsPage extends JFrame {
         EventQueue.invokeLater(new Runnable() {
             public void run() {
                 try {
-                    OrganizerEventsPage window = new OrganizerEventsPage("Temp");
+                    OrganizerDeleteEvent window = new OrganizerDeleteEvent("Temp");
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -29,14 +29,14 @@ public class OrganizerEventsPage extends JFrame {
         });
     }
 
-    public OrganizerEventsPage(String currentUsername) {
+    public OrganizerDeleteEvent(String currentUsername) {
         this.currentUsername = currentUsername;
         initialize();
     }
 
     private void initialize() {
         OrganizerController organizerController = new OrganizerController(new DatabaseConnection().getConnection());
-        frame = new JFrame("Organizer Events Page");
+        frame = new JFrame("Organizer Delete Event Page");
         frame.setBounds(100, 100, 600, 500);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setLocationRelativeTo(null);
@@ -108,45 +108,7 @@ public class OrganizerEventsPage extends JFrame {
         balanceLabel.setHorizontalAlignment(SwingConstants.CENTER);
         menuTextPanel.add(balanceLabel);
 
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
 
-        JButton addEventButton = new JButton("Add Event");
-
-        addEventButton.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                frame.dispose();
-                OrganizerAddEvent organizerAddEvent = new OrganizerAddEvent(currentUsername);
-            }
-        });
-
-        buttonPanel.add(addEventButton);
-
-        JButton editEventButton = new JButton("Edit Event");
-
-        editEventButton.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                frame.dispose();
-                OrganizerEditEvent organizerAddEvent = new OrganizerEditEvent(currentUsername);
-            }
-        });
-
-        buttonPanel.add(editEventButton);
-
-        JButton deleteEventButton = new JButton("Delete Event");
-
-        deleteEventButton.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                frame.dispose();
-                OrganizerDeleteEvent organizerAddEvent = new OrganizerDeleteEvent(currentUsername);
-            }
-        });
-
-        buttonPanel.add(deleteEventButton);
-
-        frame.getContentPane().add(buttonPanel, BorderLayout.CENTER);
 
         frame.setVisible(true);
     }
