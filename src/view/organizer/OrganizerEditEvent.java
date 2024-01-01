@@ -1,20 +1,28 @@
 package view.organizer;
 
-import controller.DatabaseConnection;
-import controller.EventController;
-import controller.OrganizerController;
+import controller.*;
+import model.Event;
+import model.Ticket;
 import view.LoginPage;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.JTableHeader;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
+import java.util.Date;
 
 public class OrganizerEditEvent extends JFrame {
 
     private JFrame frame;
 
+    private EventController eventController;
+    private TicketController ticketController;
+    private TransactionController transactionController;
     public String currentUsername;
 
     public static void main(String[] args) {
@@ -35,6 +43,7 @@ public class OrganizerEditEvent extends JFrame {
     }
 
     private void initialize() {
+        EventController eventController = new EventController(new DatabaseConnection().getConnection());
         OrganizerController organizerController = new OrganizerController(new DatabaseConnection().getConnection());
         frame = new JFrame("Organizer Edit Event Page");
         frame.setBounds(100, 100, 600, 500);
@@ -108,7 +117,80 @@ public class OrganizerEditEvent extends JFrame {
         balanceLabel.setHorizontalAlignment(SwingConstants.CENTER);
         menuTextPanel.add(balanceLabel);
 
+        JPanel panel = new JPanel();
+        DefaultTableModel model = new DefaultTableModel( ) {
+            /**
+             *
+             */
+            private static final long serialVersionUID = 1L;
 
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false; // Make all cells non-editable
+            }
+        };
+
+
+
+
+        String col[] = {"TicketID","Event Name","Price","Date","Location","Status"};
+        for (String colName: col){
+            model.addColumn(colName);
+        }
+        ArrayList<Event> ticketArrayList =   eventController.getEventsByOrganizer(currentUsername);
+        for (Event Event : ticketArrayList){
+            Event event = eventController.getEventById(Event.getId());
+
+            String status = "null";
+            Date currentDate = new Date();
+            if (event.getDate().after(currentDate)){
+                status = "Active";
+            }
+            else {
+                status = "Cancelled";
+            }
+            Object [] rowData = {event.getId(),event.getName(),event.getPrice(),event.getDate(),event.getLocation(),status};
+            model.addRow(rowData);
+        }
+
+
+        JTable table = new JTable(model);
+        table.setFocusable(false);
+        table.setRowSelectionAllowed(true);
+        table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        table.getTableHeader().setReorderingAllowed(false);
+        for (int i = 0; i < table.getColumnCount(); i++) {
+            table.getColumnModel().getColumn(i).setResizable(false);
+        }
+
+        JTableHeader header = table.getTableHeader();
+        header.setBackground(Color.yellow);
+
+        JButton editEventButton = new JButton("Edit Event");
+        editEventButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // Handle the button click event
+                int selectedRow = table.getSelectedRow();
+                if (selectedRow != -1) {
+                    Object eventId = table.getValueAt(selectedRow, 0);
+                    System.out.println((Integer)eventId);
+                    frame.dispose();
+                    EditEvent editEvent = new EditEvent(currentUsername, (Integer)eventId);
+                } else {
+                    JOptionPane.showMessageDialog(frame, "Please select an event to edit.");
+                }
+            }
+        });
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.add(editEventButton);
+        frame.add(buttonPanel, BorderLayout.SOUTH);
+
+        JScrollPane pane = new JScrollPane(table);
+
+        panel.add(pane);
+
+        frame.add(panel);
 
         frame.setVisible(true);
     }

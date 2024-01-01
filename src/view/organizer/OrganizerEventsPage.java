@@ -134,17 +134,7 @@ public class OrganizerEventsPage extends JFrame {
 
         buttonPanel.add(editEventButton);
 
-        JButton deleteEventButton = new JButton("Delete Event");
 
-        deleteEventButton.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                frame.dispose();
-                OrganizerDeleteEvent organizerAddEvent = new OrganizerDeleteEvent(currentUsername);
-            }
-        });
-
-        buttonPanel.add(deleteEventButton);
 
         frame.getContentPane().add(buttonPanel, BorderLayout.CENTER);
 
