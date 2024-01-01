@@ -2,48 +2,25 @@ package view.organizer;
 
 
 import controller.*;
+import model.Event;
 import view.LoginPage;
+import view.ProfilePage;
 
-import java.awt.EventQueue;
-
-import javax.swing.JFrame;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import java.awt.FlowLayout;
-import javax.swing.GroupLayout;
-import javax.swing.GroupLayout.Alignment;
-import javax.swing.JLabel;
-import java.awt.BorderLayout;
-import javax.swing.SwingConstants;
+import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JDesktopPane;
-import javax.swing.JPanel;
-import java.awt.GridLayout;
-import java.awt.CardLayout;
-import java.awt.Color;
-
-import javax.swing.JRadioButton;
-import javax.swing.JScrollPane;
-import javax.swing.JMenuItem;
-import javax.swing.JPopupMenu;
-import java.awt.Component;
+import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import javax.swing.JButton;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
 import java.util.ArrayList;
-import javax.swing.JList;
-import javax.swing.JTable;
-import javax.swing.ListSelectionModel;
-import model.*;
+import java.util.Date;
+
 public class OrganizerMainPage extends JFrame{
 
     private JFrame frame;
-    public String currentUsername;
+    private String currentUsername;
+
+    private EventController eventController;
     public static void main(String[] args) {
         EventQueue.invokeLater(new Runnable() {
             public void run() {
@@ -63,6 +40,7 @@ public class OrganizerMainPage extends JFrame{
     }
 
     private void initialize() {
+        eventController = new EventController(new DatabaseConnection().getConnection());
         TicketController ticketController = new TicketController(new DatabaseConnection().getConnection());
         TransactionController transactionController = new TransactionController(new DatabaseConnection().getConnection());
         OrganizerController organizerController = new OrganizerController(new DatabaseConnection().getConnection());
@@ -104,6 +82,15 @@ public class OrganizerMainPage extends JFrame{
         menuButtonPanel.add(eventsButton);
 
         JButton profileButton = new JButton("Profile");
+
+        profileButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                frame.dispose();
+                ProfilePage Lwindow = new ProfilePage(currentUsername);
+            }
+        });
+
         menuButtonPanel.add(profileButton);
 
         JButton logoutButton = new JButton("Logout");
@@ -139,6 +126,63 @@ public class OrganizerMainPage extends JFrame{
         balanceLabel.setHorizontalAlignment(SwingConstants.CENTER);
         menuTextPanel.add(balanceLabel);
 
+
+        JPanel panel = new JPanel();
+        DefaultTableModel model = new DefaultTableModel( ) {
+            /**
+             *
+             */
+            private static final long serialVersionUID = 1L;
+
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false; // Make all cells non-editable
+            }
+        };
+
+
+
+
+        String col[] = {"ID","Name","Organizer","Price","Date","Location","Capacity","Sold","Status"};
+        for (String colName: col){
+            model.addColumn(colName);
+        }
+        ArrayList<Event> ticketArrayList =   eventController.getAllEvents();
+        for (Event Event : ticketArrayList){
+            Event event = eventController.getEventById(Event.getId());
+
+            String status = "null";
+            Date currentDate = new Date();
+            if (event.getDate().after(currentDate)){
+                status = "Active";
+            }
+            else {
+                status = "Cancelled";
+            }
+            if(status == "Active") {
+                Object[] rowData = {event.getId(), event.getName(), event.getOrganizerUsername(), event.getPrice(), event.getDate(), event.getLocation(), event.getCapacity(), event.getSold(), status};
+                model.addRow(rowData);
+            }
+        }
+
+
+        JTable table = new JTable(model);
+        table.setFocusable(false);
+        table.setRowSelectionAllowed(true);
+        table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        table.getTableHeader().setReorderingAllowed(false);
+        for (int i = 0; i < table.getColumnCount(); i++) {
+            table.getColumnModel().getColumn(i).setResizable(false);
+        }
+
+        JTableHeader header = table.getTableHeader();
+        header.setBackground(Color.yellow);
+
+        JScrollPane pane = new JScrollPane(table);
+
+        panel.add(pane);
+
+        frame.add(panel);
 
         frame.setVisible(true);
 
