@@ -118,8 +118,6 @@ public class LoginPage extends JFrame{
         JPanel panelMessage = new JPanel();
         centerPanel.add(panelMessage);
 
-        JLabel textMessage = new JLabel("");
-        panelMessage.add(textMessage);
 
         JPanel panelButton = new JPanel();
         centerPanel.add(panelButton);
@@ -137,7 +135,6 @@ public class LoginPage extends JFrame{
                 String passwordText = new String(passwordField.getPassword());
                 LoginController loginController = new LoginController(new DatabaseConnection().getConnection());
                 if (loginController.login(usernameText,passwordText)) {
-                    textMessage.setText("Successfully login");
                     frmLoginpage.dispose();
                     if (loginController.getAccountType(usernameText)==RegisterController.USER){
                         UserMainPage mPage = new UserMainPage(usernameText);
@@ -147,8 +144,6 @@ public class LoginPage extends JFrame{
                     }
 
 
-                } else {
-                    textMessage.setText("username or/and password are wrong!!!");
                 }
 
             }
