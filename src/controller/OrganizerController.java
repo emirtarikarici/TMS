@@ -5,6 +5,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import model.Organizer;
+
 public class OrganizerController {
     private Connection connection;
     private PreparedStatement preparedStatement;
@@ -63,6 +65,23 @@ public class OrganizerController {
         } catch (SQLException e) {
             e.printStackTrace();
             return -1;
+        }
+    }
+
+    public Organizer getOrganizerByUsername(String username) {
+        try {
+            preparedStatement = connection.prepareStatement("SELECT * FROM organizer WHERE username = ?");
+            preparedStatement.setString(1, username);
+            resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                return new Organizer(resultSet.getString("username"), resultSet.getString("password"),
+                        resultSet.getDouble("balance"));
+            } else {
+                return null;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
         }
     }
 }
