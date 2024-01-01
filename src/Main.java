@@ -32,14 +32,14 @@ public class Main {
         System.out.println("Account changes are successful!");
 
         int e1 = controller.eventController.createEvent("event1", "azra",
-                new Timestamp(System.currentTimeMillis() + 1000000000), "ozu", 100);
+                new Timestamp(System.currentTimeMillis() + 1000000000), "ozu", 100,10.0);
         int e2 = controller.eventController.createEvent("event2", "azra",
-                new Timestamp(System.currentTimeMillis() + 2000000000), "ozu", 100);
+                new Timestamp(System.currentTimeMillis() + 2000000000), "ozu", 100, 40.5);
 
         System.out.println("Event creation is successful!");
 
-        int t1 = controller.ticketController.createTicket("turgay", e1, 123);
-        int t2 = controller.transactionController.createTransaction("turgay", "azra", 123, t1);
+        int t1 = controller.ticketController.createTicket("turgay", e1);
+        int t2 = controller.transactionController.createTransaction("turgay", "azra", t1);
 
         System.out.println("Ticket and transaction creation is successful!");
 
