@@ -94,8 +94,6 @@ public class UserMainPage extends JFrame{
         });
         menuButtonPanel.add(homeButton);
 
-        JButton historyButton = new JButton("History");
-        menuButtonPanel.add(historyButton);
 
         JButton profileButton = new JButton("Profile");
         profileButton.addMouseListener(new MouseAdapter() {
@@ -212,36 +210,15 @@ public class UserMainPage extends JFrame{
 
 
 
-        ColorRenderer renderer = new ColorRenderer();
+
 
         String col[] = {"TicketID","Event Name","Price","Date","Location","Status"};
         for (String colName: col){
             model.addColumn(colName);
         }
-        ArrayList<Ticket> ticketArrayList =   ticketController.getTicketsByUsername(currentUsername);
-        int rowCursor = 0;
-        for (Ticket ticket : ticketArrayList){
-            Event event = eventController.getEventById(ticket.getEventId());
 
-            String status = "null";
-            if (ticket.getStatus() == 0){
-                status = "Active";
-            }
-            else if (ticket.getStatus() == 1){
-                status = "Cancelled";
-            }
-            Object [] rowData = {ticket.getTicketNumber(),event.getName(),event.getPrice(),event.getDate(),event.getLocation(),status};
-            if (event.getDate().before(new Timestamp(System.currentTimeMillis()))){
-                renderer.setColorForCell(rowCursor, 3, Color.RED);
-            }
-            else {
-                renderer.setColorForCell(rowCursor, 3, Color.GREEN);
-            }
 
-            rowCursor +=1;
-            model.addRow(rowData);
-        }
-
+        ColorRenderer renderer = refreshMyTicketTable(model);
         JTable table = new JTable(model);
         table.setDefaultRenderer(Object.class, renderer);
         table.setFocusable(false);
@@ -314,18 +291,7 @@ public class UserMainPage extends JFrame{
             @Override
             public void mouseClicked(MouseEvent e) {
                 model.setRowCount(0);
-                ArrayList<Ticket> ticketArrayList =   ticketController.getTicketsByUsername(currentUsername);
-                for (Ticket ticket : ticketArrayList){
-                    String status = "null";
-                    if (ticket.getStatus() == 0){
-                        status = "Active";
-                    }
-                    else if (ticket.getStatus() == 1){
-                        status = "Cancelled";
-                    }
-                    Object [] rowData = {ticket.getTicketNumber(),ticket.getEventId(),status};
-                    model.addRow(rowData);
-                }
+                refreshMyTicketTable(model);
 
             }
         });
@@ -590,7 +556,7 @@ public class UserMainPage extends JFrame{
 
         JPanel panel_2 = new JPanel();
         addBalanceDialog.getContentPane().add(panel_2, BorderLayout.SOUTH);
-        JButton acceptBalance = new JButton("Change Password");
+        JButton acceptBalance = new JButton("Add Balance");
         acceptBalance.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -641,4 +607,31 @@ public class UserMainPage extends JFrame{
         }
     }
 
+    private ColorRenderer refreshMyTicketTable(DefaultTableModel model){
+        ColorRenderer renderer = new ColorRenderer();
+        ArrayList<Ticket> ticketArrayList =   ticketController.getTicketsByUsername(currentUsername);
+        int rowCursor = 0;
+        for (Ticket ticket : ticketArrayList){
+            Event event = eventController.getEventById(ticket.getEventId());
+
+            String status = "null";
+            if (ticket.getStatus() == 0){
+                status = "Active";
+            }
+            else if (ticket.getStatus() == 1){
+                status = "Cancelled";
+            }
+            Object [] rowData = {ticket.getTicketNumber(),event.getName(),event.getPrice(),event.getDate(),event.getLocation(),status};
+            if (event.getDate().before(new Timestamp(System.currentTimeMillis()))){
+                renderer.setColorForCell(rowCursor, 3, Color.RED);
+            }
+            else {
+                renderer.setColorForCell(rowCursor, 3, Color.GREEN);
+            }
+
+            rowCursor +=1;
+            model.addRow(rowData);
+        }
+        return renderer;
+    }
 }
