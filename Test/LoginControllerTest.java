@@ -14,11 +14,11 @@ import java.sql.Connection;
 public class LoginControllerTest {
     private LoginController loginController;
     private Connection connection;
-    private Controller controller;
+
     @BeforeEach
     void setUp() throws Exception {
         this.connection = new DatabaseConnection().getConnection();
-        this.controller = new Controller(connection);
+        Controller controller = new Controller(connection);
         loginController = new LoginController(connection);
     }
 
@@ -55,5 +55,19 @@ public class LoginControllerTest {
         String validUsername = "validUser";
         String invalidPassword = "invalidPass";
         Assertions.assertFalse(loginController.login(validUsername, invalidPassword));
+    }
+
+    @Test
+    void loginWithEmptyCredentialsReturnsFalse() throws Exception {
+        String emptyUsername = "";
+        String emptyPassword = "";
+        Assertions.assertFalse(loginController.login(emptyUsername, emptyPassword));
+    }
+
+    @Test
+    void loginWithNullCredentialsReturnsFalse() throws Exception {
+        String nullUsername = null;
+        String nullPassword = null;
+        Assertions.assertFalse(loginController.login(nullUsername, nullPassword));
     }
 }
