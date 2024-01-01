@@ -69,14 +69,14 @@ public class RegisterPage extends JFrame {
         panelCenter.setLayout(new BorderLayout());
 
         JPanel fieldsPanel = new JPanel();
-        fieldsPanel.setLayout(new GridLayout(3, 1)); // Adjusted for 3 rows
+        fieldsPanel.setLayout(new GridLayout(3, 1));
         fieldsPanel.add(new JLabel("Username:"));
         fieldsPanel.add(new JTextField(20));
 
         fieldsPanel.add(new JLabel("Password:"));
         fieldsPanel.add(new JPasswordField());
 
-        fieldsPanel.add(new JLabel("User Type:"));  // Added for User Type
+        fieldsPanel.add(new JLabel("User Type:"));
         String[] userTypeOptions = {"Organizer", "User"};
         JComboBox<String> userTypeComboBox = new JComboBox<>(userTypeOptions);
         fieldsPanel.add(userTypeComboBox);
@@ -90,7 +90,7 @@ public class RegisterPage extends JFrame {
         JButton cancelButton = new JButton("Cancel");
 
         registerButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {  // Register button
+            public void actionPerformed(ActionEvent e) {
                 String userType = userTypeComboBox.getSelectedItem().toString();;
                 String usernameText = ((JTextField) fieldsPanel.getComponent(1)).getText();
                 char[] passwordChars = ((JPasswordField) fieldsPanel.getComponent(3)).getPassword();
@@ -113,7 +113,7 @@ public class RegisterPage extends JFrame {
         });
         cancelButton.addMouseListener(new MouseAdapter() {
             @Override
-            public void mouseClicked(MouseEvent e) {  //Cancel button
+            public void mouseClicked(MouseEvent e) {
                 dispose();
                 try {
                     LoginPage loginPage = new LoginPage();

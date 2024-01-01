@@ -126,7 +126,7 @@ public class OrganizerEditEvent extends JFrame {
 
             @Override
             public boolean isCellEditable(int row, int column) {
-                return false; // Make all cells non-editable
+                return false;
             }
         };
 
@@ -170,7 +170,7 @@ public class OrganizerEditEvent extends JFrame {
         editEventButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // Handle the button click event
+
                 int selectedRow = table.getSelectedRow();
                 if (selectedRow != -1) {
                     Object eventId = table.getValueAt(selectedRow, 0);

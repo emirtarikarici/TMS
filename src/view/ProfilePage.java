@@ -121,7 +121,6 @@ public class ProfilePage {
         exitButton.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                // user status must be changed
                 System.exit(0);
             }
         });

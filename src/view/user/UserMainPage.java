@@ -27,6 +27,7 @@ import java.util.Arrays;
 import model.*;
 import view.ProfilePage;
 import java.text.DecimalFormat;
+import javax.swing.table.TableRowSorter;
 import javax.swing.text.NumberFormatter;
 import java.sql.Timestamp;
 public class UserMainPage extends JFrame{
@@ -121,7 +122,6 @@ public class UserMainPage extends JFrame{
         exitButton.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                // user status must be changed
                 System.exit(0);
             }
         });
@@ -204,13 +204,13 @@ public class UserMainPage extends JFrame{
 
             @Override
             public boolean isCellEditable(int row, int column) {
-                return false; // Make all cells non-editable
+                return false;
             }
         };
 
 
 
-        //Controller part
+
 
         ColorRenderer renderer = new ColorRenderer();
 
@@ -246,17 +246,17 @@ public class UserMainPage extends JFrame{
         table.setDefaultRenderer(Object.class, renderer);
         table.setFocusable(false);
 
-        //row selection active
+
         table.setRowSelectionAllowed(true);
 
-        //set choosing only one row
+
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
 
-        //set column reordering to false
+
         table.getTableHeader().setReorderingAllowed(false);
 
-        // Set column resizing to false
+
         for (int i = 0; i < table.getColumnCount(); i++) {
             table.getColumnModel().getColumn(i).setResizable(false);
         }
@@ -266,7 +266,7 @@ public class UserMainPage extends JFrame{
 
 
 
-        //create scroll item
+
         JScrollPane pane = new JScrollPane(table);
 
         panel.add(pane);
@@ -344,13 +344,13 @@ public class UserMainPage extends JFrame{
 
             @Override
             public boolean isCellEditable(int row, int column) {
-                return false; // Make all cells non-editable
+                return false;
             }
         };
 
 
 
-        //Controller part
+
 
         ArrayList<Event> upcomingEventList =   eventController.getUpcomingEvents();
         String col[] = {"ID","Name","Organizer","Price","Date","Location","Capacity","Sold"};
@@ -362,23 +362,26 @@ public class UserMainPage extends JFrame{
             model.addRow(rowData);
         }
 
+
+
         JPanel tablePanel = new JPanel();
 
 
         JTable table = new JTable(model);
         table.setFocusable(false);
 
-        //row selection active
+
         table.setRowSelectionAllowed(true);
 
-        //set choosing only one row
+
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
 
-        //set column reordering to false
+
         table.getTableHeader().setReorderingAllowed(false);
 
-        // Set column resizing to false
+
+
         for (int i = 0; i < table.getColumnCount(); i++) {
             table.getColumnModel().getColumn(i).setResizable(false);
         }
@@ -388,10 +391,19 @@ public class UserMainPage extends JFrame{
 
 
 
-        //create scroll item
+
         JScrollPane pane = new JScrollPane(table);
 
         tablePanel.add(pane);
+
+        TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<>(model);
+        table.setRowSorter(sorter);
+
+        DefaultRowSorter<?, ?> rowSorter = (DefaultRowSorter<?, ?>) table.getRowSorter();
+        ArrayList<RowSorter.SortKey> sortKeys = new ArrayList<>();
+        sortKeys.add(new RowSorter.SortKey(4, SortOrder.ASCENDING));
+        rowSorter.setSortKeys(sortKeys);
+        rowSorter.sort();
 
 
 
@@ -418,7 +430,7 @@ public class UserMainPage extends JFrame{
 
 
 
-                    //refresh Page
+
                     if (transactionId != -1){
                         JOptionPane.showMessageDialog(new JFrame(), "Ticket is booked successfully.  ");
                         frame.dispose();
@@ -461,13 +473,13 @@ public class UserMainPage extends JFrame{
 
             @Override
             public boolean isCellEditable(int row, int column) {
-                return false; // Make all cells non-editable
+                return false;
             }
         };
 
 
 
-        //Controller part
+
 
         ArrayList<Event> expiredEvents =   eventController.getExpiredEvents();
         String col[] = {"ID","Name","Organizer","Price","Date","Location","Capacity","Sold"};
@@ -485,17 +497,17 @@ public class UserMainPage extends JFrame{
         JTable table = new JTable(model);
         table.setFocusable(false);
 
-        //row selection active
+
         table.setRowSelectionAllowed(true);
 
-        //set choosing only one row
+
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
 
-        //set column reordering to false
+
         table.getTableHeader().setReorderingAllowed(false);
 
-        // Set column resizing to false
+
         for (int i = 0; i < table.getColumnCount(); i++) {
             table.getColumnModel().getColumn(i).setResizable(false);
         }
@@ -505,7 +517,7 @@ public class UserMainPage extends JFrame{
 
 
 
-        //create scroll item
+
         JScrollPane pane = new JScrollPane(table);
 
         tablePanel.add(pane);
@@ -557,12 +569,12 @@ public class UserMainPage extends JFrame{
 
 
 
-        // Create a NumberFormatter with a Double class
+
         NumberFormatter formatter = new NumberFormatter(new DecimalFormat("#0.00"));
         formatter.setValueClass(Double.class);
-        formatter.setMinimum(0.0);  // Optional: Set minimum value
-        formatter.setMaximum(Double.MAX_VALUE);  // Optional: Set maximum value
-        formatter.setAllowsInvalid(false);  // Disallow invalid input
+        formatter.setMinimum(0.0);
+        formatter.setMaximum(Double.MAX_VALUE);
+        formatter.setAllowsInvalid(false);
         JFormattedTextField addBalanceField = new JFormattedTextField(formatter);
         addBalanceField.setColumns(10);
         addBalanceField.setValue(10.0);

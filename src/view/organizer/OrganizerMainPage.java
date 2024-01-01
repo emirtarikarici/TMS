@@ -9,10 +9,14 @@ import view.ProfilePage;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
+import javax.swing.table.TableRowSorter;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Date;
 
 public class OrganizerMainPage extends JFrame{
@@ -108,7 +112,6 @@ public class OrganizerMainPage extends JFrame{
         exitButton.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                // user status must be changed
                 System.exit(0);
             }
         });
@@ -136,7 +139,7 @@ public class OrganizerMainPage extends JFrame{
 
             @Override
             public boolean isCellEditable(int row, int column) {
-                return false; // Make all cells non-editable
+                return false;
             }
         };
 
@@ -159,7 +162,7 @@ public class OrganizerMainPage extends JFrame{
             else {
                 status = "Cancelled";
             }
-            if(status == "Active") {
+            if("Active".equals(status)) {
                 Object[] rowData = {event.getId(), event.getName(), event.getOrganizerUsername(), event.getPrice(), event.getDate(), event.getLocation(), event.getCapacity(), event.getSold(), status};
                 model.addRow(rowData);
             }
@@ -181,6 +184,15 @@ public class OrganizerMainPage extends JFrame{
         JScrollPane pane = new JScrollPane(table);
 
         panel.add(pane);
+
+        TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<>(model);
+        table.setRowSorter(sorter);
+
+        DefaultRowSorter<?, ?> rowSorter = (DefaultRowSorter<?, ?>) table.getRowSorter();
+        ArrayList<RowSorter.SortKey> sortKeys = new ArrayList<>();
+        sortKeys.add(new RowSorter.SortKey(4, SortOrder.ASCENDING));
+        rowSorter.setSortKeys(sortKeys);
+        rowSorter.sort();
 
         frame.add(panel);
 
