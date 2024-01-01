@@ -155,8 +155,9 @@ public class UserMainPage extends JFrame{
         tabbedPane.setBounds(50,50,200,200);
         frame.getContentPane().add(tabbedPane, BorderLayout.CENTER);
 
-        tabbedPane.add("Event",getEventsPanel(currentUsername));
-        tabbedPane.add("Ticket",getYourTicketPanel(currentUsername));
+        tabbedPane.add("Upcoming Events",getEventsPanel(currentUsername));
+        tabbedPane.add("My Tickets",getYourTicketPanel(currentUsername));
+        tabbedPane.add("Expired Events",displayExpiredEventPanel(currentUsername));
 
 
         frame.setVisible(true);
@@ -185,12 +186,14 @@ public class UserMainPage extends JFrame{
         //Controller part
 
 
-        String col[] = {"TicketID","eventId","status"};
+        String col[] = {"TicketID","Event Name","Price","Date","Location","Status"};
         for (String colName: col){
             model.addColumn(colName);
         }
         ArrayList<Ticket> ticketArrayList =   ticketController.getTicketsByUsername(currentUsername);
         for (Ticket ticket : ticketArrayList){
+            Event event = eventController.getEventById(ticket.getEventId());
+
             String status = "null";
             if (ticket.getStatus() == 0){
                 status = "Active";
@@ -198,7 +201,7 @@ public class UserMainPage extends JFrame{
             else if (ticket.getStatus() == 1){
                 status = "Cancelled";
             }
-            Object [] rowData = {ticket.getTicketNumber(),ticket.getEventId(),status};
+            Object [] rowData = {ticket.getTicketNumber(),event.getName(),event.getPrice(),event.getDate(),event.getLocation(),status};
             model.addRow(rowData);
         }
 
@@ -401,6 +404,92 @@ public class UserMainPage extends JFrame{
                 model.setRowCount(0);
                 ArrayList<Event> upcomingEventList =   eventController.getUpcomingEvents();
                 for (Event event : upcomingEventList){
+                    Object [] rowData = {event.getId(),event.getName(),event.getOrganizerUsername(),event.getPrice(),event.getDate(),event.getLocation(),event.getCapacity(),event.getSold()};
+                    model.addRow(rowData);
+                }
+
+            }
+        });
+        panelButton.add(refreshButton);
+        return tablePanel;
+    }
+
+    public JPanel displayExpiredEventPanel(String currentUsername){
+        DefaultTableModel model = new DefaultTableModel( ) {
+            /**
+             *
+             */
+            private static final long serialVersionUID = 1L;
+
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false; // Make all cells non-editable
+            }
+        };
+
+
+
+        //Controller part
+
+        ArrayList<Event> expiredEvents =   eventController.getExpiredEvents();
+        String col[] = {"ID","Name","Organizer","Price","Date","Location","Capacity","Sold"};
+        for (String colName: col){
+            model.addColumn(colName);
+        }
+        for (Event event : expiredEvents){
+            Object [] rowData = {event.getId(),event.getName(),event.getOrganizerUsername(),event.getPrice(),event.getDate(),event.getLocation(),event.getCapacity(),event.getSold()};
+            model.addRow(rowData);
+        }
+
+        JPanel tablePanel = new JPanel();
+
+
+        JTable table = new JTable(model);
+        table.setFocusable(false);
+
+        //row selection active
+        table.setRowSelectionAllowed(true);
+
+        //set choosing only one row
+        table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+
+
+        //set column reordering to false
+        table.getTableHeader().setReorderingAllowed(false);
+
+        // Set column resizing to false
+        for (int i = 0; i < table.getColumnCount(); i++) {
+            table.getColumnModel().getColumn(i).setResizable(false);
+        }
+
+        JTableHeader header = table.getTableHeader();
+        header.setBackground(Color.yellow);
+
+
+
+        //create scroll item
+        JScrollPane pane = new JScrollPane(table);
+
+        tablePanel.add(pane);
+
+
+
+        JPanel panelButton = new JPanel();
+
+        tablePanel.add(panelButton);
+        panelButton.setLayout(new BoxLayout(panelButton, BoxLayout.Y_AXIS));
+
+
+
+
+        panelButton.add(Box.createVerticalStrut(10));
+        JButton refreshButton = new JButton("Refresh Table");
+        refreshButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                model.setRowCount(0);
+                ArrayList<Event> expiredEvents =   eventController.getExpiredEvents();
+                for (Event event : expiredEvents){
                     Object [] rowData = {event.getId(),event.getName(),event.getOrganizerUsername(),event.getPrice(),event.getDate(),event.getLocation(),event.getCapacity(),event.getSold()};
                     model.addRow(rowData);
                 }
