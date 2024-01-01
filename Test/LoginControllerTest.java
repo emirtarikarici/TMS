@@ -9,16 +9,15 @@ import org.junit.jupiter.api.Test;
 
 import java.sql.Connection;
 
-
-
 public class LoginControllerTest {
     private LoginController loginController;
     private Connection connection;
+    private Controller controller;
 
     @BeforeEach
     void setUp() throws Exception {
         this.connection = new DatabaseConnection().getConnection();
-        Controller controller = new Controller(connection);
+        this.controller = new Controller(connection);
         loginController = new LoginController(connection);
     }
 
@@ -28,32 +27,39 @@ public class LoginControllerTest {
         connection.close();
     }
 
-
     @Test
     void loginWithValidCredentialsReturnsTrue() throws Exception {
         String validUsername = "validUser";
         String validPassword = "validPass";
+        controller.registerController.register(validUsername, validPassword, RegisterController.USER);
         Assertions.assertTrue(loginController.login(validUsername, validPassword));
     }
 
     @Test
     void loginWithInvalidCredentialsReturnsFalse() throws Exception {
+        String validUsername = "validUser";
+        String validPassword = "validPass";
         String invalidUsername = "invalidUser";
         String invalidPassword = "invalidPass";
+        controller.registerController.register(validUsername, validPassword, RegisterController.USER);
         Assertions.assertFalse(loginController.login(invalidUsername, invalidPassword));
     }
 
     @Test
     void loginWithInvalidUsernameReturnsFalse() throws Exception {
-        String invalidUsername = "invalidUser";
+        String validUsername = "validUser";
         String validPassword = "validPass";
+        String invalidUsername = "validUser";
+        controller.registerController.register(validUsername, validPassword, RegisterController.USER);
         Assertions.assertFalse(loginController.login(invalidUsername, validPassword));
     }
 
     @Test
     void loginWithInvalidPasswordReturnsFalse() throws Exception {
         String validUsername = "validUser";
+        String validPassword = "validPass";
         String invalidPassword = "invalidPass";
+        controller.registerController.register(validUsername, validPassword, RegisterController.USER);
         Assertions.assertFalse(loginController.login(validUsername, invalidPassword));
     }
 
@@ -61,6 +67,7 @@ public class LoginControllerTest {
     void loginWithEmptyCredentialsReturnsFalse() throws Exception {
         String emptyUsername = "";
         String emptyPassword = "";
+        controller.registerController.register(emptyUsername, emptyPassword, RegisterController.USER);
         Assertions.assertFalse(loginController.login(emptyUsername, emptyPassword));
     }
 
@@ -68,6 +75,7 @@ public class LoginControllerTest {
     void loginWithNullCredentialsReturnsFalse() throws Exception {
         String nullUsername = null;
         String nullPassword = null;
+        controller.registerController.register(nullUsername, nullPassword, RegisterController.USER);
         Assertions.assertFalse(loginController.login(nullUsername, nullPassword));
     }
 
@@ -75,6 +83,7 @@ public class LoginControllerTest {
     void logoutAfterLoginChangesLoginStatus() throws Exception {
         String validUsername = "validUser";
         String validPassword = "validPass";
+        controller.registerController.register(validUsername, validPassword, RegisterController.USER);
         loginController.login(validUsername, validPassword);
         loginController.logout();
         Assertions.assertFalse(loginController.isLoggedIn());
