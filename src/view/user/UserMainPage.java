@@ -30,6 +30,10 @@ public class UserMainPage extends JFrame{
 
     private JFrame frame;
     public String currentUsername;
+    private EventController eventController;
+    private TicketController ticketController;
+    private TransactionController transactionController;
+    private UserController userController;
     /**
      * Launch the application.
      */
@@ -57,9 +61,10 @@ public class UserMainPage extends JFrame{
      * Initialize the contents of the frame.
      */
     private void initialize() {
-        TicketController ticketController = new TicketController(new DatabaseConnection().getConnection());
-        TransactionController transactionController = new TransactionController(new DatabaseConnection().getConnection());
-        UserController userController = new UserController(new DatabaseConnection().getConnection());
+        ticketController = new TicketController(new DatabaseConnection().getConnection());
+        transactionController = new TransactionController(new DatabaseConnection().getConnection());
+        userController = new UserController(new DatabaseConnection().getConnection());
+        eventController = new EventController(new DatabaseConnection().getConnection()) ;
         frame = new JFrame("User Main Page");
         frame.setBounds(100, 100, 600, 500);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -142,6 +147,27 @@ public class UserMainPage extends JFrame{
 
 
 
+
+
+
+
+        JTabbedPane tabbedPane = new JTabbedPane();
+        tabbedPane.setBounds(50,50,200,200);
+        frame.getContentPane().add(tabbedPane, BorderLayout.CENTER);
+
+        tabbedPane.add("Event",getEventsPanel(currentUsername));
+        tabbedPane.add("Ticket",getYourTicketPanel(currentUsername));
+
+
+        frame.setVisible(true);
+
+
+    }
+
+    public JPanel getYourTicketPanel(String currentUsername){
+        JPanel panel = new JPanel();
+
+
         DefaultTableModel model = new DefaultTableModel( ) {
             /**
              *
@@ -157,7 +183,134 @@ public class UserMainPage extends JFrame{
 
 
         //Controller part
-        EventController eventController = new EventController(new DatabaseConnection().getConnection()) ;
+
+
+        String col[] = {"TicketID","eventId","status"};
+        for (String colName: col){
+            model.addColumn(colName);
+        }
+        ArrayList<Ticket> ticketArrayList =   ticketController.getTicketsByUsername(currentUsername);
+        for (Ticket ticket : ticketArrayList){
+            String status = "null";
+            if (ticket.getStatus() == 0){
+                status = "Active";
+            }
+            else if (ticket.getStatus() == 1){
+                status = "Cancelled";
+            }
+            Object [] rowData = {ticket.getTicketNumber(),ticket.getEventId(),status};
+            model.addRow(rowData);
+        }
+
+        JTable table = new JTable(model);
+        table.setFocusable(false);
+
+        //row selection active
+        table.setRowSelectionAllowed(true);
+
+        //set choosing only one row
+        table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+
+
+        //set column reordering to false
+        table.getTableHeader().setReorderingAllowed(false);
+
+        // Set column resizing to false
+        for (int i = 0; i < table.getColumnCount(); i++) {
+            table.getColumnModel().getColumn(i).setResizable(false);
+        }
+
+        JTableHeader header = table.getTableHeader();
+        header.setBackground(Color.yellow);
+
+
+
+        //create scroll item
+        JScrollPane pane = new JScrollPane(table);
+
+        panel.add(pane);
+
+
+
+        JPanel panelButton = new JPanel();
+
+        panel.add(panelButton);
+        panelButton.setLayout(new BoxLayout(panelButton, BoxLayout.Y_AXIS));
+
+        JButton cancelButton = new JButton("Cancel Ticket");
+        panelButton.add(cancelButton);
+        cancelButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                int selectedRow = table.getSelectedRow();
+                if (selectedRow == -1){
+                    JOptionPane.showMessageDialog(new JFrame(), "There is no selected event");
+                }
+                else{
+                    int ticketId = (int)(table.getValueAt(selectedRow, 0));
+                    int transactionNumber = transactionController.getTransactionByTicket(ticketId).getTransactionNumber();
+
+                    if(transactionController.cancelTransaction(transactionNumber)){
+                        JOptionPane.showMessageDialog(new JFrame(), "Ticket is cancelled successfully.");
+                        frame.dispose();
+                        UserMainPage userMainPage = new UserMainPage(currentUsername);
+                    }
+                    else{
+                        JOptionPane.showMessageDialog(new JFrame(), "Ticket cannot be cancelled");
+
+                    }
+                }
+
+
+
+            }
+        });
+
+
+        panelButton.add(Box.createVerticalStrut(10));
+        JButton refreshButton = new JButton("Refresh Table");
+        refreshButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                model.setRowCount(0);
+                ArrayList<Ticket> ticketArrayList =   ticketController.getTicketsByUsername(currentUsername);
+                for (Ticket ticket : ticketArrayList){
+                    String status = "null";
+                    if (ticket.getStatus() == 0){
+                        status = "Active";
+                    }
+                    else if (ticket.getStatus() == 1){
+                        status = "Cancelled";
+                    }
+                    Object [] rowData = {ticket.getTicketNumber(),ticket.getEventId(),status};
+                    model.addRow(rowData);
+                }
+
+            }
+        });
+        panelButton.add(refreshButton);
+
+        return panel;
+    }
+
+    public JPanel getEventsPanel(String currentUsername){
+
+        DefaultTableModel model = new DefaultTableModel( ) {
+            /**
+             *
+             */
+            private static final long serialVersionUID = 1L;
+
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false; // Make all cells non-editable
+            }
+        };
+
+
+
+        //Controller part
+
         ArrayList<Event> upcomingEventList =   eventController.getUpcomingEvents();
         String col[] = {"ID","Name","Organizer","Price","Date","Location","Capacity","Sold"};
         for (String colName: col){
@@ -168,12 +321,8 @@ public class UserMainPage extends JFrame{
             model.addRow(rowData);
         }
 
-
-
-
-
         JPanel tablePanel = new JPanel();
-        frame.getContentPane().add(tablePanel, BorderLayout.CENTER);
+
 
         JTable table = new JTable(model);
         table.setFocusable(false);
@@ -259,10 +408,8 @@ public class UserMainPage extends JFrame{
             }
         });
         panelButton.add(refreshButton);
-
-        frame.setVisible(true);
-
-
+        return tablePanel;
     }
+
 
 }
