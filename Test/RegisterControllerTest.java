@@ -34,4 +34,14 @@ public class RegisterControllerTest {
     public void shouldReturnFalseWhenPasswordIsShort() throws Exception {
         assertFalse(registerController.register("username", "short", RegisterController.USER));
     }
+
+    @Test
+    public void shouldCreateUserWhenValidCredentialsAreProvided() throws Exception {
+        assertTrue(registerController.register("newUser", "password", RegisterController.USER));
+    }
+
+    @Test
+    public void shouldCreateOrganizerWhenValidCredentialsAreProvided() throws Exception {
+        assertTrue(registerController.register("newOrganizer", "password", RegisterController.ORGANIZER));
+    }
 }
