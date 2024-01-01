@@ -29,4 +29,9 @@ public class RegisterControllerTest {
         registerController.register("existingUser", "password", RegisterController.USER);
         assertFalse(registerController.register("existingUser", "password", RegisterController.USER));
     }
+
+    @Test
+    public void shouldReturnFalseWhenPasswordIsShort() throws Exception {
+        assertFalse(registerController.register("username", "short", RegisterController.USER));
+    }
 }
