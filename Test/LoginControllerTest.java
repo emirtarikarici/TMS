@@ -79,4 +79,22 @@ public class LoginControllerTest {
         loginController.logout();
         Assertions.assertFalse(loginController.isLoggedIn());
     }
+
+    @Test
+    void getAccountTypeForExistingUserReturnsUserType() throws Exception {
+        String existingUsername = "existingUser";
+        Assertions.assertEquals(RegisterController.USER, loginController.getAccountType(existingUsername));
+    }
+
+    @Test
+    void getAccountTypeForExistingOrganizerReturnsOrganizerType() throws Exception {
+        String existingUsername = "existingOrganizer";
+        Assertions.assertEquals(RegisterController.ORGANIZER, loginController.getAccountType(existingUsername));
+    }
+
+    @Test
+    void getAccountTypeForNonExistingUserTypeReturnsNegativeOne() throws Exception {
+        String nonExistingUsername = "nonExistingUser";
+        Assertions.assertEquals(-1, loginController.getAccountType(nonExistingUsername));
+    }
 }
