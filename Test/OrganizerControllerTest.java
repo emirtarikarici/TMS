@@ -72,4 +72,25 @@ class OrganizerControllerTest {
             e.printStackTrace();
         }
     }
+    @Test
+    void getOrganizerByUsername(){
+        try {
+            statement = connection.createStatement();
+            controller.registerController.register("xxx", "111111", RegisterController.ORGANIZER);
+            controller.registerController.register("yyy", "222222", RegisterController.USER);
+            controller.userController.addBalance("yyy", 200.0);
+
+            int eventId = controller.eventController.createEvent("event","xxx", new Timestamp(System.currentTimeMillis()),"location",3,70.0);
+            int ticketId = controller.ticketController.createTicket("yyy",eventId);
+            controller.transactionController.createTransaction("yyy","xxx", ticketId);
+
+            assertEquals(organizerController.getOrganizerByUsername("xxx").getUsername(), "xxx");
+            assertEquals(organizerController.getOrganizerByUsername("xxx").getPassword(), "111111");
+            assertEquals(organizerController.getOrganizerByUsername("xxx").getBalance(), 70.0);
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            fail("SQL Exception occurred");
+        }
+    }
 }
