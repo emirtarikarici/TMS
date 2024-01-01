@@ -20,11 +20,9 @@ public class LoginController {
     public boolean login(String username, String password) {
         try {
             preparedStatement = connection.prepareStatement(
-                    "(SELECT * FROM user WHERE username = ? AND password = ?) UNION (SELECT * FROM organizer WHERE username = ? AND password = ?)");
+                    "(SELECT * FROM user WHERE username = ?) UNION (SELECT * FROM organizer WHERE username = ?)");
             preparedStatement.setString(1, username);
-            preparedStatement.setString(2, password);
-            preparedStatement.setString(3, username);
-            preparedStatement.setString(4, password);
+            preparedStatement.setString(2, username);
             resultSet = preparedStatement.executeQuery();
             if (resultSet.next()) {
                 if (!password.equals(resultSet.getString("password"))) {
