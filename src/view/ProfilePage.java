@@ -20,7 +20,10 @@ public class ProfilePage {
     private JFrame frame;
     private UserController userController;
     private LoginController loginController;
+    private OrganizerController organizerController;
     public String currentUsername;
+
+    public int userTypeInt;
 
     /**
      * Launch the application.
@@ -50,9 +53,10 @@ public class ProfilePage {
      * Initialize the contents of the frame.
      */
     private void initialize() {
+        organizerController = new OrganizerController(new DatabaseConnection().getConnection());
         loginController = new LoginController(new DatabaseConnection().getConnection());
         userController = new UserController(new DatabaseConnection().getConnection());
-        int userTypeInt = loginController.getAccountType(currentUsername);
+        userTypeInt = loginController.getAccountType(currentUsername);
 
         frame = new JFrame("Profile Page");
         frame.setBounds(100, 100, 600, 500);
@@ -78,7 +82,7 @@ public class ProfilePage {
                     UserMainPage userMainPage = new UserMainPage(currentUsername);
                 }
                 else{
-                    //OrganizerMainPage organizerMainPage = new (currentUsername);
+                    OrganizerMainPage organizerMainPage = new OrganizerMainPage(currentUsername);
                 }
 
 
@@ -246,25 +250,50 @@ public class ProfilePage {
                 char[] newPass1 = newpasswordField.getPassword();
                 char[] newPass2 = confnewpasswordField.getPassword();
                 String oldPassword = new String(oldpasswordField.getPassword());
-                if (oldPassword.equals(userController.getUserByUsername(username).getPassword())){
-                    if (Arrays.equals(newPass1, newPass2)){
-                        if(userController.changePassword(username,new String(newPass1))){
-                            JOptionPane.showMessageDialog(new JFrame(), "Password is changed successfully");
-                            changePasswordDialog.dispose();
-                            mainFrame.dispose();
-                            new ProfilePage(username);
-                        }
-                        else{
-                            JOptionPane.showMessageDialog(new JFrame(), "Requirements not met!!!");
+
+                if (userTypeInt == RegisterController.USER){
+                    if (oldPassword.equals(userController.getUserByUsername(username).getPassword())){
+                        if (Arrays.equals(newPass1, newPass2)){
+                            if(userController.changePassword(username,new String(newPass1))){
+                                JOptionPane.showMessageDialog(new JFrame(), "Password is changed successfully");
+                                changePasswordDialog.dispose();
+                                mainFrame.dispose();
+                                new ProfilePage(username);
+                            }
+                            else{
+                                JOptionPane.showMessageDialog(new JFrame(), "Requirements not met!!!");
+                            }
+
+                        }else{
+                            JOptionPane.showMessageDialog(new JFrame(), "Passwords not matching!!!");
                         }
 
-                    }else{
-                        JOptionPane.showMessageDialog(new JFrame(), "Passwords not matching!!!");
                     }
-
+                    else{
+                        JOptionPane.showMessageDialog(new JFrame(), "Old password is wrong!!!");
+                    }
                 }
-                else{
-                    JOptionPane.showMessageDialog(new JFrame(), "Old password is wrong!!!");
+                else {
+                    if (oldPassword.equals(organizerController.getOrganizerByUsername(username).getPassword())){
+                        if (Arrays.equals(newPass1, newPass2)){
+                            if(organizerController.changePassword(username,new String(newPass1))){
+                                JOptionPane.showMessageDialog(new JFrame(), "Password is changed successfully");
+                                changePasswordDialog.dispose();
+                                mainFrame.dispose();
+                                new ProfilePage(username);
+                            }
+                            else{
+                                JOptionPane.showMessageDialog(new JFrame(), "Requirements not met!!!");
+                            }
+
+                        }else{
+                            JOptionPane.showMessageDialog(new JFrame(), "Passwords not matching!!!");
+                        }
+
+                    }
+                    else{
+                        JOptionPane.showMessageDialog(new JFrame(), "Old password is wrong!!!");
+                    }
                 }
 
 
@@ -325,25 +354,49 @@ public class ProfilePage {
                 String newUsername1 = newUsernameField.getText();
                 String newUsername2 = confnewusernameField.getText();
                 String oldPassword = new String(oldpasswordField.getPassword());
-                if (oldPassword.equals(userController.getUserByUsername(username).getPassword())){
-                    if ((newUsername1.equals(newUsername2)) ){
-                        if(userController.changeUsername(username,newUsername1)){
-                            JOptionPane.showMessageDialog(new JFrame(), "Username is changed successfully");
-                            changeUsernameDialog.dispose();
-                            mainFrame.dispose();
-                            new ProfilePage(newUsername1);
-                        }
-                        else{
-                            JOptionPane.showMessageDialog(new JFrame(), "Requirements not met!!!");
-                        }
+                if(userTypeInt == RegisterController.USER){
+                    if (oldPassword.equals(userController.getUserByUsername(username).getPassword())){
+                        if ((newUsername1.equals(newUsername2)) ){
+                            if(userController.changeUsername(username,newUsername1)){
+                                JOptionPane.showMessageDialog(new JFrame(), "Username is changed successfully");
+                                changeUsernameDialog.dispose();
+                                mainFrame.dispose();
+                                new ProfilePage(newUsername1);
+                            }
+                            else{
+                                JOptionPane.showMessageDialog(new JFrame(), "Requirements not met!!!");
+                            }
 
-                    }else{
-                        JOptionPane.showMessageDialog(new JFrame(), "Usernames not matching!!!");
+                        }else{
+                            JOptionPane.showMessageDialog(new JFrame(), "Usernames not matching!!!");
+                        }
+                    }
+                    else{
+                        JOptionPane.showMessageDialog(new JFrame(), "Password is wrong!!!");
                     }
                 }
-                else{
-                    JOptionPane.showMessageDialog(new JFrame(), "Password is wrong!!!");
+                else {
+                    if (oldPassword.equals(organizerController.getOrganizerByUsername(username).getPassword())){
+                        if ((newUsername1.equals(newUsername2)) ){
+                            if(organizerController.changeUsername(username,newUsername1)){
+                                JOptionPane.showMessageDialog(new JFrame(), "Username is changed successfully");
+                                changeUsernameDialog.dispose();
+                                mainFrame.dispose();
+                                new ProfilePage(newUsername1);
+                            }
+                            else{
+                                JOptionPane.showMessageDialog(new JFrame(), "Requirements not met!!!");
+                            }
+
+                        }else{
+                            JOptionPane.showMessageDialog(new JFrame(), "Usernames not matching!!!");
+                        }
+                    }
+                    else{
+                        JOptionPane.showMessageDialog(new JFrame(), "Password is wrong!!!");
+                    }
                 }
+
 
 
 
