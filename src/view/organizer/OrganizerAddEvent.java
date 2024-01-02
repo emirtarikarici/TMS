@@ -65,18 +65,6 @@ public class OrganizerAddEvent extends JFrame {
         });
         menuButtonPanel.add(homeButton);
 
-        JButton eventsButton = new JButton("Events");
-
-        eventsButton.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                frame.dispose();
-                OrganizerEventsPage organizerEventsPage = new OrganizerEventsPage(currentUsername);
-            }
-        });
-
-        menuButtonPanel.add(eventsButton);
-
         JButton profileButton = new JButton("Profile");
         profileButton.addMouseListener(new MouseAdapter() {
             @Override
@@ -210,7 +198,7 @@ public class OrganizerAddEvent extends JFrame {
             @Override
             public void mouseClicked(MouseEvent e) {
                 frame.dispose();
-                OrganizerEventsPage userMainPage = new OrganizerEventsPage(currentUsername);
+                OrganizerMainPage userMainPage = new OrganizerMainPage(currentUsername);
             }
         });
 

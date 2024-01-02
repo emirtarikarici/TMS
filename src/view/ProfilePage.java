@@ -2,7 +2,6 @@ package view;
 
 
 import controller.*;
-import view.organizer.OrganizerEventsPage;
 import view.organizer.OrganizerMainPage;
 import view.user.UserMainPage;
 
@@ -11,8 +10,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 import javax.swing.*;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
 import java.util.Arrays;
 
 
@@ -92,20 +89,6 @@ public class ProfilePage {
         menuButtonPanel.add(homeButton);
 
 
-        if(userTypeInt == RegisterController.ORGANIZER){
-            JButton eventsButton = new JButton("Events");
-
-            eventsButton.addMouseListener(new MouseAdapter() {
-                @Override
-                public void mouseClicked(MouseEvent e) {
-                    frame.dispose();
-                    OrganizerEventsPage organizerEventsPage = new OrganizerEventsPage(currentUsername);
-                }
-            });
-
-            menuButtonPanel.add(eventsButton);
-        }
-
         JButton profileButton = new JButton("Profile");
         profileButton.addMouseListener(new MouseAdapter() {
             @Override
@@ -164,7 +147,7 @@ public class ProfilePage {
         usernameText.setHorizontalAlignment(SwingConstants.CENTER);
         centerPanel.add(usernameText);
 
-        JLabel balanceText = new JLabel("Balance: " + currentBalance);
+        JLabel balanceText = new JLabel("Balance: " + currentBalance+ " $");
         balanceText.setFont(new Font("Tahoma", Font.BOLD, 31));
         balanceText.setHorizontalAlignment(SwingConstants.CENTER);
         centerPanel.add(balanceText);
