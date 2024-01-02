@@ -49,7 +49,7 @@ public class LoginControllerTest {
     void loginWithInvalidUsernameReturnsFalse() throws Exception {
         String validUsername = "validUser";
         String validPassword = "validPass";
-        String invalidUsername = "validUser";
+        String invalidUsername = "invalidUser";
         controller.registerController.register(validUsername, validPassword, RegisterController.USER);
         Assertions.assertFalse(loginController.login(invalidUsername, validPassword));
     }
@@ -92,12 +92,16 @@ public class LoginControllerTest {
     @Test
     void getAccountTypeForExistingUserReturnsUserType() throws Exception {
         String existingUsername = "existingUser";
+        String password = "password";
+        controller.registerController.register(existingUsername,password, RegisterController.USER);
         Assertions.assertEquals(RegisterController.USER, loginController.getAccountType(existingUsername));
     }
 
     @Test
     void getAccountTypeForExistingOrganizerReturnsOrganizerType() throws Exception {
         String existingUsername = "existingOrganizer";
+        String password = "password";
+        controller.registerController.register(existingUsername,password, RegisterController.ORGANIZER);
         Assertions.assertEquals(RegisterController.ORGANIZER, loginController.getAccountType(existingUsername));
     }
 
