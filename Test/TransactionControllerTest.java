@@ -1,3 +1,4 @@
+import controller.DatabaseConnection;
 import controller.TransactionController;
 import model.Transaction;
 import org.junit.jupiter.api.AfterEach;
@@ -17,6 +18,7 @@ public class TransactionControllerTest {
 
     @BeforeEach
     public void setUp() {
+        this.connection = new DatabaseConnection().getConnection();
         transactionController = new TestableTransactionController(connection);
     }
 
