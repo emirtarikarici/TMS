@@ -47,8 +47,8 @@ class TicketControllerTest {
 
             int id1 = controller.ticketController.createTicket("abc", eventId);
 
-            assertEquals(controller.ticketController.getTicketById(id1).getEventId(),eventId);
-            assertEquals(controller.ticketController.getTicketById(id1).getUserUsername(),"abc");
+            assertEquals(eventId, controller.ticketController.getTicketById(id1).getEventId());
+            assertEquals("abc", controller.ticketController.getTicketById(id1).getUserUsername());
 
 
         } catch (SQLException e) {
@@ -74,8 +74,8 @@ class TicketControllerTest {
             int eventId2 = controller.eventController.createEvent("Event2", "fff", new Timestamp(date2.getTime()), "location-", 3, 15.30);
             int id1 = controller.ticketController.createTicket("abc", eventId1);
             int id2 = controller.ticketController.createTicket("abc", eventId2);
-            assertEquals(controller.ticketController.getTicketsByUsername("abc").get(0).getEventId(),eventId1);
-            assertEquals(controller.ticketController.getTicketsByUsername("abc").get(1).getEventId(),eventId2);
+            assertEquals(eventId1, controller.ticketController.getTicketsByUsername("abc").get(0).getEventId());
+            assertEquals(eventId2, controller.ticketController.getTicketsByUsername("abc").get(1).getEventId());
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -99,8 +99,8 @@ class TicketControllerTest {
             int eventId2 = controller.eventController.createEvent("Event2", "fff", new Timestamp(date2.getTime()), "location-", 3, 15.30);
             int id1 = controller.ticketController.createTicket("abc", eventId1);
             int id2 = controller.ticketController.createTicket("abc", eventId2);
-            assertEquals(controller.ticketController.getTicketsByEventId(eventId1).get(0).getUserUsername(),"abc");
-            assertEquals(controller.ticketController.getTicketsByEventId(eventId2).get(0).getUserUsername(),"abc");
+            assertEquals("abc", controller.ticketController.getTicketsByEventId(eventId1).get(0).getUserUsername());
+            assertEquals("abc", controller.ticketController.getTicketsByEventId(eventId2).get(0).getUserUsername());
 
 
         } catch (SQLException e) {
@@ -128,10 +128,10 @@ class TicketControllerTest {
             int eventId2 = controller.eventController.createEvent("Event2", "fff", new Timestamp(date2.getTime()), "location-", 3, 15.30);
             int id1 = controller.ticketController.createTicket("abc", eventId1);
             int id2 = controller.ticketController.createTicket("def", eventId2);
-            assertEquals(controller.ticketController.getAllTickets().get(0).getEventId(),eventId1);
-            assertEquals(controller.ticketController.getAllTickets().get(1).getEventId(),eventId2);
-            assertEquals(controller.ticketController.getAllTickets().get(0).getUserUsername(),"abc");
-            assertEquals(controller.ticketController.getAllTickets().get(1).getUserUsername(),"def");
+            assertEquals(eventId1, controller.ticketController.getAllTickets().get(0).getEventId());
+            assertEquals(eventId2, controller.ticketController.getAllTickets().get(1).getEventId());
+            assertEquals("abc", controller.ticketController.getAllTickets().get(0).getUserUsername());
+            assertEquals("def", controller.ticketController.getAllTickets().get(1).getUserUsername());
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -159,10 +159,10 @@ class TicketControllerTest {
             int eventId2 = controller.eventController.createEvent("Event2", "fff", new Timestamp(date2.getTime()), "location-", 3, 15.30);
             int id1 = controller.ticketController.createTicket("abc", eventId1);
             int id2 = controller.ticketController.createTicket("def", eventId2);
-            assertEquals(controller.ticketController.getTicketById(id1).getEventId(),eventId1);
-            assertEquals(controller.ticketController.getTicketById(id2).getEventId(),eventId2);
-            assertEquals(controller.ticketController.getTicketById(id1).getUserUsername(),"abc");
-            assertEquals(controller.ticketController.getTicketById(id2).getUserUsername(),"def");
+            assertEquals(eventId1, controller.ticketController.getTicketById(id1).getEventId());
+            assertEquals(eventId2, controller.ticketController.getTicketById(id2).getEventId());
+            assertEquals("abc", controller.ticketController.getTicketById(id1).getUserUsername());
+            assertEquals("def", controller.ticketController.getTicketById(id2).getUserUsername());
 
         } catch (SQLException e) {
             e.printStackTrace();

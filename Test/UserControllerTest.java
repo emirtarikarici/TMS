@@ -67,7 +67,7 @@ class UserControllerTest {
 
             if (resultSet.next()) {
 
-                assertEquals(resultSet.getDouble("balance"), 200.0);
+                assertEquals( 200.0, resultSet.getDouble("balance"));
             } else {
                 fail("No rows found in the result set");
             }
@@ -83,7 +83,7 @@ class UserControllerTest {
             statement = connection.createStatement();
             controller.registerController.register("xxx", "111111", RegisterController.USER);
             userController.addBalance("xxx", 200.0);
-            assertEquals(userController.getBalance("xxx"), 200.0);
+            assertEquals( 200.0, userController.getBalance("xxx"));
         } catch (SQLException e) {
             e.printStackTrace();
             fail("SQL Exception occurred");
@@ -96,9 +96,9 @@ class UserControllerTest {
             statement = connection.createStatement();
             controller.registerController.register("xxx", "111111", RegisterController.USER);
             userController.addBalance("xxx", 200.0);
-            assertEquals(userController.getUserByUsername("xxx").getUsername(), "xxx");
-            assertEquals(userController.getUserByUsername("xxx").getPassword(), "111111");
-            assertEquals(userController.getUserByUsername("xxx").getBalance(), 200.0);
+            assertEquals("xxx", userController.getUserByUsername("xxx").getUsername());
+            assertEquals("111111", userController.getUserByUsername("xxx").getPassword());
+            assertEquals(200.0, userController.getUserByUsername("xxx").getBalance());
 
         } catch (SQLException e) {
             e.printStackTrace();

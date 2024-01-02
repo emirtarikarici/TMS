@@ -67,7 +67,7 @@ class OrganizerControllerTest {
             int id = controller.eventController.createEvent("event","xxx", new Timestamp(System.currentTimeMillis()),"location",3,20.30);
             int ticket = controller.ticketController.createTicket("yyy",id);
             controller.transactionController.createTransaction("yyy","xxx",ticket);
-            assertEquals(controller.organizerController.getBalance("xxx"),20.30);
+            assertEquals(20.30, controller.organizerController.getBalance("xxx"));
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -84,9 +84,9 @@ class OrganizerControllerTest {
             int ticketId = controller.ticketController.createTicket("yyy",eventId);
             controller.transactionController.createTransaction("yyy","xxx", ticketId);
 
-            assertEquals(organizerController.getOrganizerByUsername("xxx").getUsername(), "xxx");
-            assertEquals(organizerController.getOrganizerByUsername("xxx").getPassword(), "111111");
-            assertEquals(organizerController.getOrganizerByUsername("xxx").getBalance(), 70.0);
+            assertEquals("xxx", organizerController.getOrganizerByUsername("xxx").getUsername());
+            assertEquals("111111", organizerController.getOrganizerByUsername("xxx").getPassword());
+            assertEquals(70.0, organizerController.getOrganizerByUsername("xxx").getBalance());
 
         } catch (SQLException e) {
             e.printStackTrace();
