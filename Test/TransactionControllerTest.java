@@ -49,6 +49,17 @@ public class TransactionControllerTest {
         transactionController.setCreateTransactionResult(-1);
         assertEquals(-1, transactionController.createTransaction("userUsername", "organizerUsername", 1));
     }
+    @Test
+    public void cancelTransactionReturnsTrueWhenValid() {
+        transactionController.setCancelTransactionResult(true);
+        assertTrue(transactionController.cancelTransaction(1));
+    }
+
+    @Test
+    public void cancelTransactionReturnsFalseWhenInvalid() {
+        transactionController.setCancelTransactionResult(false);
+        assertFalse(transactionController.cancelTransaction(1));
+    }
 
     private static class TestableTransactionController extends TransactionController {
         private Boolean validateTransactionResult;
