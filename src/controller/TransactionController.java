@@ -126,6 +126,15 @@ public class TransactionController {
                 return false;
             } else if (resultSet.getInt("status") == Transaction.STATUS_COMPLETED) {
                 preparedStatement = connection.prepareStatement(
+                        "SELECT COUNT(*) AS c FROM event WHERE id = (SELECT eventId FROM ticket WHERE id = ?) AND date < NOW()");
+                preparedStatement.setInt(1, resultSet.getInt("ticketId"));
+                ResultSet resultSet2 = preparedStatement.executeQuery();
+                resultSet2.next();
+                if (resultSet2.getInt("c") > 0) {
+                    JOptionPane.showMessageDialog(new JFrame(), "Expired event's ticket cannot be cancelled!");
+                    return false;
+                }
+                preparedStatement = connection.prepareStatement(
                         "UPDATE user SET balance = balance + ? WHERE username = ?");
                 preparedStatement.setDouble(1, resultSet.getDouble("amount"));
                 preparedStatement.setString(2, resultSet.getString("userUsername"));
@@ -151,6 +160,7 @@ public class TransactionController {
                 preparedStatement.executeUpdate();
                 return true;
             } else {
+                JOptionPane.showMessageDialog(new JFrame(), "Transaction is already cancelled!");
                 return false;
             }
         } catch (SQLException e) {
