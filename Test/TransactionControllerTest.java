@@ -1,23 +1,23 @@
-import controller.TransactionController;
+import controller.*;
 import model.Transaction;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.sql.Connection;
+import java.sql.*;
 import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertNull;
 
 
 public class TransactionControllerTest {
-    private TestableTransactionController transactionController;
     private Connection connection;
+    private Controller controller;
 
     @BeforeEach
     public void setUp() {
-        transactionController = new TestableTransactionController(connection);
+        this.connection = new DatabaseConnection().getConnection();
+        this.controller = new Controller(connection);
     }
 
     @AfterEach
@@ -27,97 +27,179 @@ public class TransactionControllerTest {
     }
 
     @Test
-    public void validateTransactionReturnsTrueWhenValid() {
-        transactionController.setValidateTransactionResult(true);
-        assertTrue(transactionController.validateTransaction("username", 1));
+    void createTransactionReturnsIdWhenValid() {
+        controller.registerController.register("organizer", "password",RegisterController.ORGANIZER);
+        controller.registerController.register("user", "password",RegisterController.USER);
+        controller.loginController.login("user", "password");
+        controller.loginController.login("organizer", "password");
+        controller.userController.addBalance("user", 1000);
+        Timestamp timestamp = new Timestamp("2024-12-12 12:12:12.000".hashCode());
+        controller.eventController.createEvent("event", "organizer",timestamp, "PSM", 500, 300);
+        controller.ticketController.createTicket("user", 1);
+        int transactionId = controller.transactionController.createTransaction("user", "organizer", 1);
+        assertTrue(transactionId > 0);
     }
 
     @Test
-    public void validateTransactionReturnsFalseWhenInvalid() {
-        transactionController.setValidateTransactionResult(false);
-        assertFalse(transactionController.validateTransaction("username", 1));
+    void createTransactionReturnsMinusOneWhenInsufficientBalance() {
+        controller.registerController.register("organizer", "password",RegisterController.ORGANIZER);
+        controller.registerController.register("user", "password",RegisterController.USER);
+        controller.loginController.login("user", "password");
+        controller.loginController.login("organizer", "password");
+        controller.userController.addBalance("user", 100);
+        Timestamp timestamp = new Timestamp("2024-12-12 12:12:12".hashCode());
+        controller.eventController.createEvent("event", "organizer",timestamp, "PSM", 500, 300);
+        controller.ticketController.createTicket("user", 1);
+        int transactionId = controller.transactionController.createTransaction("user", "organizer", 1);
+        assertEquals(-1, transactionId);
     }
 
     @Test
-    public void createTransactionReturnsIdWhenValid() {
-        transactionController.setCreateTransactionResult(1);
-        assertEquals(1, transactionController.createTransaction("userUsername", "organizerUsername", 1));
+    void createTransactionReturnsMinusOneWhenEventIsFull() {
+        controller.registerController.register("organizer", "password",RegisterController.ORGANIZER);
+        controller.registerController.register("user", "password",RegisterController.USER);
+        controller.loginController.login("user", "password");
+        controller.loginController.login("organizer", "password");
+        controller.userController.addBalance("user", 1000);
+        Timestamp timestamp = new Timestamp("2024-12-12 12:12:12".hashCode());
+        controller.eventController.createEvent("event", "organizer",timestamp, "PSM", 0, 300);
+        controller.ticketController.createTicket("user", 1);
+        int transactionId = controller.transactionController.createTransaction("user", "organizer", 1);
+        assertEquals(-1, transactionId);
     }
 
     @Test
-    public void createTransactionReturnsMinusOneWhenInvalid() {
-        transactionController.setCreateTransactionResult(-1);
-        assertEquals(-1, transactionController.createTransaction("userUsername", "organizerUsername", 1));
-    }
-    @Test
-    public void cancelTransactionReturnsTrueWhenValid() {
-        transactionController.setCancelTransactionResult(true);
-        assertTrue(transactionController.cancelTransaction(1));
-    }
-
-    @Test
-    public void cancelTransactionReturnsFalseWhenInvalid() {
-        transactionController.setCancelTransactionResult(false);
-        assertFalse(transactionController.cancelTransaction(1));
+    void cancelTransactionReturnsTrueWhenValid() {
+        controller.registerController.register("organizer", "password",RegisterController.ORGANIZER);
+        controller.registerController.register("user", "password",RegisterController.USER);
+        controller.loginController.login("user", "password");
+        controller.loginController.login("organizer", "password");
+        controller.userController.addBalance("user", 1000);
+        Timestamp timestamp = new Timestamp("2024-12-12 12:12:12.000".hashCode());
+        controller.eventController.createEvent("event", "organizer",timestamp, "PSM", 500, 300);
+        controller.ticketController.createTicket("user", 1);
+        int transactionId = controller.transactionController.createTransaction("user", "organizer", 1);
+        assertTrue(controller.transactionController.cancelTransaction(transactionId));
     }
 
     @Test
-    public void getTransactionByUserReturnsTransactionsWhenFound() {
-        ArrayList<Transaction> expectedTransactions = new ArrayList<>();
-        expectedTransactions.add(new Transaction(1, "userUsername", "organizerUsername", 1, 0, 1));
-        transactionController.setGetTransactionByUserResult(expectedTransactions);
-        assertEquals(expectedTransactions, transactionController.getTransactionByUser("username"));
+    void getTransactionByUserReturnsTransactionsWhenValid() {
+        controller.registerController.register("organizer", "password",RegisterController.ORGANIZER);
+        controller.registerController.register("user", "password",RegisterController.USER);
+        controller.loginController.login("user", "password");
+        controller.loginController.login("organizer", "password");
+        controller.userController.addBalance("user", 1000);
+        Timestamp timestamp = new Timestamp("2024-12-12 12:12:12.000".hashCode());
+        controller.eventController.createEvent("event", "organizer",timestamp, "PSM", 500, 300);
+        controller.ticketController.createTicket("user", 1);
+        int transactionId = controller.transactionController.createTransaction("user", "organizer", 1);
+        ArrayList<Transaction> transactions = controller.transactionController.getTransactionByUser("user");
+        assertFalse(transactions.isEmpty());
     }
 
     @Test
-    public void getTransactionByUserReturnsNullWhenNotFound() {
-        transactionController.setGetTransactionByUserResult(null);
-        assertNull(transactionController.getTransactionByUser("username"));
+    void getTransactionByOrganizerReturnsTransactionsWhenValid() {
+        controller.registerController.register("organizer", "password",RegisterController.ORGANIZER);
+        controller.registerController.register("user", "password",RegisterController.USER);
+        controller.loginController.login("user", "password");
+        controller.loginController.login("organizer", "password");
+        controller.userController.addBalance("user", 1000);
+        Timestamp timestamp = new Timestamp("2024-12-12 12:12:12.000".hashCode());
+        controller.eventController.createEvent("event", "organizer",timestamp, "PSM", 500, 300);
+        controller.ticketController.createTicket("user", 1);
+        int transactionId = controller.transactionController.createTransaction("user", "organizer", 1);
+        ArrayList<Transaction> transactions = controller.transactionController.getTransactionByOrganizer("organizer");
+        assertFalse(transactions.isEmpty());
     }
-    private static class TestableTransactionController extends TransactionController {
-        private Boolean validateTransactionResult;
-        private Integer createTransactionResult;
-        private Boolean cancelTransactionResult;
-        private ArrayList<Transaction> getTransactionByUserResult;
 
-        public TestableTransactionController(Connection connection) {
-            super(connection);
-        }
+    @Test
+    void getTransactionByIdReturnsTransactionsWhenValid() {
+        controller.registerController.register("organizer", "password",RegisterController.ORGANIZER);
+        controller.registerController.register("user", "password",RegisterController.USER);
+        controller.loginController.login("user", "password");
+        controller.loginController.login("organizer", "password");
+        controller.userController.addBalance("user", 1000);
+        Timestamp timestamp = new Timestamp("2024-12-12 12:12:12.000".hashCode());
+        controller.eventController.createEvent("event", "organizer",timestamp, "PSM", 500, 300);
+        controller.ticketController.createTicket("user", 1);
+        int transactionId = controller.transactionController.createTransaction("user", "organizer", 1);
+        Transaction transaction = controller.transactionController.getTransactionById(1);
+        assertNotNull(transaction);
+    }
 
-        @Override
-        public boolean validateTransaction(String username, int ticketId) {
-            return validateTransactionResult;
-        }
+    @Test
+    void getAllTransactionsReturnsTransactionsWhenValid() {
+        controller.registerController.register("organizer", "password",RegisterController.ORGANIZER);
+        controller.registerController.register("user", "password",RegisterController.USER);
+        controller.loginController.login("user", "password");
+        controller.loginController.login("organizer", "password");
+        controller.userController.addBalance("user", 1000);
+        Timestamp timestamp = new Timestamp("2024-12-12 12:12:12.000".hashCode());
+        controller.eventController.createEvent("event", "organizer",timestamp, "PSM", 500, 300);
+        controller.ticketController.createTicket("user", 1);
+        int transactionId = controller.transactionController.createTransaction("user", "organizer", 1);
+        ArrayList<Transaction> transactions = controller.transactionController.getAllTransactions();
+        assertFalse(transactions.isEmpty());
+    }
 
-        @Override
-        public int createTransaction(String userUsername, String organizerUsername, int ticketId) {
-            return createTransactionResult;
-        }
+    @Test
+    void getCompletedTransactionsReturnsTransactionsWhenExist() {
+        controller.registerController.register("organizer", "password", RegisterController.ORGANIZER);
+        controller.registerController.register("user", "password", RegisterController.USER);
+        controller.loginController.login("user", "password");
+        controller.loginController.login("organizer", "password");
+        controller.userController.addBalance("user", 1000);
+        Timestamp timestamp = new Timestamp("2020-12-12 12:12:12".hashCode());
+        controller.eventController.createEvent("event", "organizer", timestamp, "PSM", 500, 300);
+        controller.ticketController.createTicket("user", 1);
+        controller.transactionController.createTransaction("user", "organizer", 1);
+        controller.transactionController.cancelTransaction(1);
+        ArrayList<Transaction> transactions = controller.transactionController.getCompletedTransactions();
+        assertTrue(transactions.isEmpty());
+    }
 
-        @Override
-        public boolean cancelTransaction(int id) {
-            return cancelTransactionResult;
-        }
+    @Test
+    void getCancelledTransactionsReturnsTransactionsWhenExist() {
+        controller.registerController.register("organizer", "password", RegisterController.ORGANIZER);
+        controller.registerController.register("user", "password", RegisterController.USER);
+        controller.loginController.login("user", "password");
+        controller.loginController.login("organizer", "password");
+        controller.userController.addBalance("user", 1000);
+        Timestamp timestamp = new Timestamp("2024-12-12 12:12:12.000".hashCode());
+        controller.eventController.createEvent("event", "organizer", timestamp, "PSM", 500, 300);
+        controller.ticketController.createTicket("user", 1);
+        controller.transactionController.createTransaction("user", "organizer", 1);
+        controller.transactionController.cancelTransaction(1);
+        ArrayList<Transaction> transactions = controller.transactionController.getCancelledTransactions();
+        assertFalse(transactions.isEmpty());
+    }
 
-        @Override
-        public ArrayList<Transaction> getTransactionByUser(String userUsername) {
-            return getTransactionByUserResult;
-        }
+    void getTransactionsByEventReturnsTransactionsWhenExist() {
+        controller.registerController.register("organizer", "password", RegisterController.ORGANIZER);
+        controller.registerController.register("user", "password", RegisterController.USER);
+        controller.loginController.login("user", "password");
+        controller.loginController.login("organizer", "password");
+        controller.userController.addBalance("user", 1000);
+        Timestamp timestamp = new Timestamp("2020-12-12 12:12:12".hashCode());
+        controller.eventController.createEvent("event", "organizer", timestamp, "PSM", 500, 300);
+        controller.ticketController.createTicket("user", 1);
+        controller.transactionController.createTransaction("user", "organizer", 1);
+        ArrayList<Transaction> transactions = controller.transactionController.getTransactionsByEvent(1);
+        assertFalse(transactions.isEmpty());
+    }
 
-        public void setValidateTransactionResult(Boolean validateTransactionResult) {
-            this.validateTransactionResult = validateTransactionResult;
-        }
-
-        public void setCreateTransactionResult(Integer createTransactionResult) {
-            this.createTransactionResult = createTransactionResult;
-        }
-
-        public void setCancelTransactionResult(Boolean cancelTransactionResult) {
-            this.cancelTransactionResult = cancelTransactionResult;
-        }
-
-        public void setGetTransactionByUserResult(ArrayList<Transaction> getTransactionByUserResult) {
-            this.getTransactionByUserResult = getTransactionByUserResult;
-        }
+    @Test
+    void getTransactionByTicketsReturnsTransactionsWhenExist() {
+        controller.registerController.register("organizer", "password", RegisterController.ORGANIZER);
+        controller.registerController.register("user", "password", RegisterController.USER);
+        controller.loginController.login("user", "password");
+        controller.loginController.login("organizer", "password");
+        controller.userController.addBalance("user", 1000);
+        Timestamp timestamp = new Timestamp("2020-12-12 12:12:12".hashCode());
+        controller.eventController.createEvent("event", "organizer", timestamp, "PSM", 500, 300);
+        controller.ticketController.createTicket("user", 1);
+        controller.transactionController.createTransaction("user", "organizer", 1);
+        Transaction transaction = controller.transactionController.getTransactionByTicket(1);
+        assertNotNull(transaction);
     }
 }
