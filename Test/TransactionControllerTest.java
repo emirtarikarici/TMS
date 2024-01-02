@@ -61,6 +61,19 @@ public class TransactionControllerTest {
         assertFalse(transactionController.cancelTransaction(1));
     }
 
+    @Test
+    public void getTransactionByUserReturnsTransactionsWhenFound() {
+        ArrayList<Transaction> expectedTransactions = new ArrayList<>();
+        expectedTransactions.add(new Transaction(1, "userUsername", "organizerUsername", 1, 0, 1));
+        transactionController.setGetTransactionByUserResult(expectedTransactions);
+        assertEquals(expectedTransactions, transactionController.getTransactionByUser("username"));
+    }
+
+    @Test
+    public void getTransactionByUserReturnsNullWhenNotFound() {
+        transactionController.setGetTransactionByUserResult(null);
+        assertNull(transactionController.getTransactionByUser("username"));
+    }
     private static class TestableTransactionController extends TransactionController {
         private Boolean validateTransactionResult;
         private Integer createTransactionResult;
