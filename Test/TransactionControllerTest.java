@@ -33,10 +33,10 @@ public class TransactionControllerTest {
         controller.loginController.login("user", "password");
         controller.loginController.login("organizer", "password");
         controller.userController.addBalance("user", 1000);
-        Timestamp timestamp = new Timestamp("2024-12-12 12:12:12.000".hashCode());
-        controller.eventController.createEvent("event", "organizer",timestamp, "PSM", 500, 300);
-        controller.ticketController.createTicket("user", 1);
-        int transactionId = controller.transactionController.createTransaction("user", "organizer", 1);
+        Timestamp timestamp = Timestamp.valueOf("2024-12-12 12:12:12");
+        int eventId = controller.eventController.createEvent("event", "organizer",timestamp, "PSM", 500, 300);
+        int ticketId = controller.ticketController.createTicket("user", eventId);
+        int transactionId = controller.transactionController.createTransaction("user", "organizer", ticketId);
         assertTrue(transactionId > 0);
     }
 
@@ -47,10 +47,10 @@ public class TransactionControllerTest {
         controller.loginController.login("user", "password");
         controller.loginController.login("organizer", "password");
         controller.userController.addBalance("user", 100);
-        Timestamp timestamp = new Timestamp("2024-12-12 12:12:12".hashCode());
-        controller.eventController.createEvent("event", "organizer",timestamp, "PSM", 500, 300);
-        controller.ticketController.createTicket("user", 1);
-        int transactionId = controller.transactionController.createTransaction("user", "organizer", 1);
+        Timestamp timestamp = Timestamp.valueOf("2024-12-12 12:12:12");
+        int eventId = controller.eventController.createEvent("event", "organizer",timestamp, "PSM", 500, 300);
+        int ticketId = controller.ticketController.createTicket("user", eventId);
+        int transactionId = controller.transactionController.createTransaction("user", "organizer", ticketId);
         assertEquals(-1, transactionId);
     }
 
@@ -61,10 +61,10 @@ public class TransactionControllerTest {
         controller.loginController.login("user", "password");
         controller.loginController.login("organizer", "password");
         controller.userController.addBalance("user", 1000);
-        Timestamp timestamp = new Timestamp("2024-12-12 12:12:12".hashCode());
-        controller.eventController.createEvent("event", "organizer",timestamp, "PSM", 0, 300);
-        controller.ticketController.createTicket("user", 1);
-        int transactionId = controller.transactionController.createTransaction("user", "organizer", 1);
+        Timestamp timestamp = Timestamp.valueOf("2024-12-12 12:12:12");
+        int eventId = controller.eventController.createEvent("event", "organizer",timestamp, "PSM", 0, 300);
+        int ticketId = controller.ticketController.createTicket("user", eventId);
+        int transactionId = controller.transactionController.createTransaction("user", "organizer", ticketId);
         assertEquals(-1, transactionId);
     }
 
@@ -75,10 +75,10 @@ public class TransactionControllerTest {
         controller.loginController.login("user", "password");
         controller.loginController.login("organizer", "password");
         controller.userController.addBalance("user", 1000);
-        Timestamp timestamp = new Timestamp("2024-12-12 12:12:12.000".hashCode());
-        controller.eventController.createEvent("event", "organizer",timestamp, "PSM", 500, 300);
-        controller.ticketController.createTicket("user", 1);
-        int transactionId = controller.transactionController.createTransaction("user", "organizer", 1);
+        Timestamp timestamp = Timestamp.valueOf("2024-12-12 12:12:12");
+        int eventId = controller.eventController.createEvent("event", "organizer",timestamp, "PSM", 500, 300);
+        int ticketId = controller.ticketController.createTicket("user", eventId);
+        int transactionId = controller.transactionController.createTransaction("user", "organizer", ticketId);
         assertTrue(controller.transactionController.cancelTransaction(transactionId));
     }
 
@@ -89,10 +89,10 @@ public class TransactionControllerTest {
         controller.loginController.login("user", "password");
         controller.loginController.login("organizer", "password");
         controller.userController.addBalance("user", 1000);
-        Timestamp timestamp = new Timestamp("2024-12-12 12:12:12.000".hashCode());
-        controller.eventController.createEvent("event", "organizer",timestamp, "PSM", 500, 300);
-        controller.ticketController.createTicket("user", 1);
-        int transactionId = controller.transactionController.createTransaction("user", "organizer", 1);
+        Timestamp timestamp = Timestamp.valueOf("2024-12-12 12:12:12");
+        int eventId = controller.eventController.createEvent("event", "organizer",timestamp, "PSM", 500, 300);
+        int ticketId = controller.ticketController.createTicket("user", eventId);
+        int transactionId = controller.transactionController.createTransaction("user", "organizer", ticketId);
         ArrayList<Transaction> transactions = controller.transactionController.getTransactionByUser("user");
         assertFalse(transactions.isEmpty());
     }
@@ -104,10 +104,10 @@ public class TransactionControllerTest {
         controller.loginController.login("user", "password");
         controller.loginController.login("organizer", "password");
         controller.userController.addBalance("user", 1000);
-        Timestamp timestamp = new Timestamp("2024-12-12 12:12:12.000".hashCode());
-        controller.eventController.createEvent("event", "organizer",timestamp, "PSM", 500, 300);
-        controller.ticketController.createTicket("user", 1);
-        int transactionId = controller.transactionController.createTransaction("user", "organizer", 1);
+        Timestamp timestamp = Timestamp.valueOf("2024-12-12 12:12:12");
+        int eventId = controller.eventController.createEvent("event", "organizer",timestamp, "PSM", 500, 300);
+        int ticketId= controller.ticketController.createTicket("user", eventId);
+        int transactionId = controller.transactionController.createTransaction("user", "organizer", ticketId);
         ArrayList<Transaction> transactions = controller.transactionController.getTransactionByOrganizer("organizer");
         assertFalse(transactions.isEmpty());
     }
@@ -119,11 +119,11 @@ public class TransactionControllerTest {
         controller.loginController.login("user", "password");
         controller.loginController.login("organizer", "password");
         controller.userController.addBalance("user", 1000);
-        Timestamp timestamp = new Timestamp("2024-12-12 12:12:12.000".hashCode());
-        controller.eventController.createEvent("event", "organizer",timestamp, "PSM", 500, 300);
-        controller.ticketController.createTicket("user", 1);
-        int transactionId = controller.transactionController.createTransaction("user", "organizer", 1);
-        Transaction transaction = controller.transactionController.getTransactionById(1);
+        Timestamp timestamp = Timestamp.valueOf("2024-12-12 12:12:12");
+        int eventId = controller.eventController.createEvent("event", "organizer",timestamp, "PSM", 500, 300);
+        int ticketId = controller.ticketController.createTicket("user", eventId);
+        int transactionId = controller.transactionController.createTransaction("user", "organizer", ticketId);
+        Transaction transaction = controller.transactionController.getTransactionById(transactionId);
         assertNotNull(transaction);
     }
 
@@ -134,10 +134,10 @@ public class TransactionControllerTest {
         controller.loginController.login("user", "password");
         controller.loginController.login("organizer", "password");
         controller.userController.addBalance("user", 1000);
-        Timestamp timestamp = new Timestamp("2024-12-12 12:12:12.000".hashCode());
-        controller.eventController.createEvent("event", "organizer",timestamp, "PSM", 500, 300);
-        controller.ticketController.createTicket("user", 1);
-        int transactionId = controller.transactionController.createTransaction("user", "organizer", 1);
+        Timestamp timestamp = Timestamp.valueOf("2024-12-12 12:12:12");
+        int eventId = controller.eventController.createEvent("event", "organizer",timestamp, "PSM", 500, 300);
+        int ticketId = controller.ticketController.createTicket("user", eventId);
+        int transactionId = controller.transactionController.createTransaction("user", "organizer", ticketId);
         ArrayList<Transaction> transactions = controller.transactionController.getAllTransactions();
         assertFalse(transactions.isEmpty());
     }
@@ -149,13 +149,13 @@ public class TransactionControllerTest {
         controller.loginController.login("user", "password");
         controller.loginController.login("organizer", "password");
         controller.userController.addBalance("user", 1000);
-        Timestamp timestamp = new Timestamp("2020-12-12 12:12:12".hashCode());
-        controller.eventController.createEvent("event", "organizer", timestamp, "PSM", 500, 300);
-        controller.ticketController.createTicket("user", 1);
-        controller.transactionController.createTransaction("user", "organizer", 1);
-        controller.transactionController.cancelTransaction(1);
+        Timestamp timestamp = Timestamp.valueOf("2020-12-12 12:12:12");
+        int eventId = controller.eventController.createEvent("event", "organizer", timestamp, "PSM", 500, 300);
+        int ticketId = controller.ticketController.createTicket("user", eventId);
+        int transactionId = controller.transactionController.createTransaction("user", "organizer", ticketId);
+        controller.transactionController.cancelTransaction(transactionId);
         ArrayList<Transaction> transactions = controller.transactionController.getCompletedTransactions();
-        assertTrue(transactions.isEmpty());
+        assertFalse(transactions.isEmpty());
     }
 
     @Test
@@ -165,11 +165,11 @@ public class TransactionControllerTest {
         controller.loginController.login("user", "password");
         controller.loginController.login("organizer", "password");
         controller.userController.addBalance("user", 1000);
-        Timestamp timestamp = new Timestamp("2024-12-12 12:12:12.000".hashCode());
-        controller.eventController.createEvent("event", "organizer", timestamp, "PSM", 500, 300);
-        controller.ticketController.createTicket("user", 1);
-        controller.transactionController.createTransaction("user", "organizer", 1);
-        controller.transactionController.cancelTransaction(1);
+        Timestamp timestamp = Timestamp.valueOf("2024-12-12 12:12:12");
+        int eventId = controller.eventController.createEvent("event", "organizer", timestamp, "PSM", 500, 300);
+        int ticketId = controller.ticketController.createTicket("user", eventId );
+        int transactionId = controller.transactionController.createTransaction("user", "organizer", ticketId);
+        controller.transactionController.cancelTransaction(transactionId);
         ArrayList<Transaction> transactions = controller.transactionController.getCancelledTransactions();
         assertFalse(transactions.isEmpty());
     }
@@ -180,11 +180,11 @@ public class TransactionControllerTest {
         controller.loginController.login("user", "password");
         controller.loginController.login("organizer", "password");
         controller.userController.addBalance("user", 1000);
-        Timestamp timestamp = new Timestamp("2020-12-12 12:12:12".hashCode());
-        controller.eventController.createEvent("event", "organizer", timestamp, "PSM", 500, 300);
-        controller.ticketController.createTicket("user", 1);
-        controller.transactionController.createTransaction("user", "organizer", 1);
-        ArrayList<Transaction> transactions = controller.transactionController.getTransactionsByEvent(1);
+        Timestamp timestamp = Timestamp.valueOf("2020-12-12 12:12:12");
+        int eventId = controller.eventController.createEvent("event", "organizer", timestamp, "PSM", 500, 300);
+        int ticketId = controller.ticketController.createTicket("user", eventId);
+        int transactionId = controller.transactionController.createTransaction("user", "organizer", ticketId);
+        ArrayList<Transaction> transactions = controller.transactionController.getTransactionsByEvent(eventId);
         assertFalse(transactions.isEmpty());
     }
 
@@ -195,11 +195,11 @@ public class TransactionControllerTest {
         controller.loginController.login("user", "password");
         controller.loginController.login("organizer", "password");
         controller.userController.addBalance("user", 1000);
-        Timestamp timestamp = new Timestamp("2020-12-12 12:12:12".hashCode());
-        controller.eventController.createEvent("event", "organizer", timestamp, "PSM", 500, 300);
-        controller.ticketController.createTicket("user", 1);
-        controller.transactionController.createTransaction("user", "organizer", 1);
-        Transaction transaction = controller.transactionController.getTransactionByTicket(1);
+        Timestamp timestamp = Timestamp.valueOf("2020-12-12 12:12:12");
+        int eventId = controller.eventController.createEvent("event", "organizer", timestamp, "PSM", 500, 300);
+        int ticketId = controller.ticketController.createTicket("user", eventId);
+        int transactionId = controller.transactionController.createTransaction("user", "organizer", ticketId);
+        Transaction transaction = controller.transactionController.getTransactionByTicket(ticketId);
         assertNotNull(transaction);
     }
 }
