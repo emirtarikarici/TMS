@@ -24,6 +24,21 @@ public class TransactionController {
     public boolean validateTransaction(String username, int ticketId) {
         try {
             preparedStatement = connection.prepareStatement(
+                    "SELECT COUNT(*) AS c FROM ticket WHERE userUsername = ? AND status = ? AND eventId IN (SELECT id FROM event WHERE date = (SELECT date FROM event WHERE id = (SELECT eventId FROM ticket WHERE id = ?)))");
+            preparedStatement.setString(1, username);
+            preparedStatement.setInt(2, Ticket.ACTIVE);
+            preparedStatement.setInt(3, ticketId);
+            resultSet = preparedStatement.executeQuery();
+            resultSet.next();
+            if (resultSet.getInt("c") > 1) {
+                JOptionPane.showMessageDialog(new JFrame(),
+                        "You already have a ticket for another event at this time and date!");
+                preparedStatement = connection.prepareStatement("DELETE FROM ticket WHERE id = ?");
+                preparedStatement.setInt(1, ticketId);
+                preparedStatement.executeUpdate();
+                return false;
+            }
+            preparedStatement = connection.prepareStatement(
                     "SELECT user.balance AS balance, event.price AS price, event.capacity AS capacity, event.sold AS sold FROM user, event, ticket WHERE user.username = ? AND ticket.id = ? AND event.id = (SELECT eventId FROM ticket WHERE id = ?)");
             preparedStatement.setString(1, username);
             preparedStatement.setInt(2, ticketId);
