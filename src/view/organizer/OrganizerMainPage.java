@@ -3,6 +3,7 @@ package view.organizer;
 
 import controller.*;
 import model.Event;
+import model.User;
 import view.LoginPage;
 import view.ProfilePage;
 
@@ -195,6 +196,36 @@ public class OrganizerMainPage extends JFrame{
         rowSorter.sort();
 
         frame.add(panel);
+
+        JButton attendeesButton = new JButton("Attendees");
+        attendeesButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                // Get the selected event ID
+                int selectedRow = table.getSelectedRow();
+                if (selectedRow != -1) {
+                    int eventId = (int) table.getValueAt(selectedRow, 0);
+                    ArrayList<User> attendees = eventController.getAttendees(eventId);
+                    if (attendees != null && !attendees.isEmpty()) {
+                        StringBuilder attendeeList = new StringBuilder("Attendees:\n");
+                        for (User attendee : attendees) {
+                            attendeeList.append(attendee.getUsername()).append("\n");
+                        }
+                        JOptionPane.showMessageDialog(frame, attendeeList.toString(), "Attendees", JOptionPane.INFORMATION_MESSAGE);
+                    } else {
+                        JOptionPane.showMessageDialog(frame, "No attendees for the selected event.", "Attendees", JOptionPane.INFORMATION_MESSAGE);
+                    }
+                } else {
+                    JOptionPane.showMessageDialog(frame, "Please select an event from the table.", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        });
+
+        JPanel attendeesButtonPanel = new JPanel();
+        attendeesButtonPanel.add(attendeesButton);
+
+        menuButtonPanel.add(attendeesButtonPanel);
+
 
         frame.setVisible(true);
 
