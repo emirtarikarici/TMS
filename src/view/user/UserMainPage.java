@@ -160,7 +160,7 @@ public class UserMainPage extends JFrame{
 
 
 
-        JLabel balanceLabel = new JLabel("Balance: "+userController.getBalance(currentUsername)+ " TL" );
+        JLabel balanceLabel = new JLabel("Balance: "+userController.getBalance(currentUsername)+ "$" );
         balanceLabel.setHorizontalAlignment(SwingConstants.CENTER);
         menuTextPanel.add(balanceLabel);
 
@@ -226,6 +226,7 @@ public class UserMainPage extends JFrame{
 
         table.setRowSelectionAllowed(true);
 
+        table.setPreferredScrollableViewportSize(new Dimension(800, 300));
 
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
@@ -291,7 +292,8 @@ public class UserMainPage extends JFrame{
             @Override
             public void mouseClicked(MouseEvent e) {
                 model.setRowCount(0);
-                refreshMyTicketTable(model);
+                ColorRenderer renderer1 =  refreshMyTicketTable(model);
+                table.setDefaultRenderer(Object.class, renderer1);
 
             }
         });
@@ -336,7 +338,7 @@ public class UserMainPage extends JFrame{
         JTable table = new JTable(model);
         table.setFocusable(false);
 
-
+        table.setPreferredScrollableViewportSize(new Dimension(800, 300));
         table.setRowSelectionAllowed(true);
 
 
@@ -463,7 +465,7 @@ public class UserMainPage extends JFrame{
         JTable table = new JTable(model);
         table.setFocusable(false);
 
-
+        table.setPreferredScrollableViewportSize(new Dimension(800, 300));
         table.setRowSelectionAllowed(true);
 
 

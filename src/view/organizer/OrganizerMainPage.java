@@ -122,11 +122,11 @@ public class OrganizerMainPage extends JFrame{
         menuPanel.add(menuTextPanel);
         menuTextPanel.setLayout(new GridLayout(1,0, 0, 0));
 
-        JLabel helloLabel = new JLabel(currentUsername);
+        JLabel helloLabel = new JLabel("Hello " + currentUsername);
         helloLabel.setHorizontalAlignment(SwingConstants.CENTER);
         menuTextPanel.add(helloLabel);
 
-        JLabel balanceLabel = new JLabel(String.valueOf(organizerController.getBalance(currentUsername)));
+        JLabel balanceLabel = new JLabel("Balance: " + String.valueOf(organizerController.getBalance(currentUsername))+ "$");
         balanceLabel.setHorizontalAlignment(SwingConstants.CENTER);
         menuTextPanel.add(balanceLabel);
 
@@ -173,6 +173,7 @@ public class OrganizerMainPage extends JFrame{
         JTable table = new JTable(model);
         table.setFocusable(false);
         table.setRowSelectionAllowed(true);
+        table.setPreferredScrollableViewportSize(new Dimension(800, 300));
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         table.getTableHeader().setReorderingAllowed(false);
         for (int i = 0; i < table.getColumnCount(); i++) {
@@ -197,6 +198,23 @@ public class OrganizerMainPage extends JFrame{
 
         frame.add(panel);
 
+
+
+
+
+
+
+
+
+        JPanel panelButton = new JPanel();
+
+        panel.add(panelButton);
+        panelButton.setLayout(new BoxLayout(panelButton, BoxLayout.Y_AXIS));
+
+
+
+
+        panelButton.add(Box.createVerticalStrut(10));
         JButton attendeesButton = new JButton("Attendees");
         attendeesButton.addMouseListener(new MouseAdapter() {
             @Override
@@ -220,11 +238,7 @@ public class OrganizerMainPage extends JFrame{
                 }
             }
         });
-
-        JPanel attendeesButtonPanel = new JPanel();
-        attendeesButtonPanel.add(attendeesButton);
-
-        menuButtonPanel.add(attendeesButtonPanel);
+        panelButton.add(attendeesButton);
 
 
         frame.setVisible(true);

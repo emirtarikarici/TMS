@@ -148,7 +148,7 @@ public class ProfilePage {
         menuTextPanel.add(helloLabel);
 
         double currentBalance  = (userTypeInt == RegisterController.USER) ? userController.getBalance(currentUsername) : organizerController.getBalance(currentUsername);
-        JLabel balanceLabel = new JLabel("Balance: "+currentBalance+ " TL" );
+        JLabel balanceLabel = new JLabel("Balance: "+currentBalance+ " $" );
         balanceLabel.setHorizontalAlignment(SwingConstants.CENTER);
         menuTextPanel.add(balanceLabel);
 

@@ -117,11 +117,11 @@ public class OrganizerEditEvent extends JFrame {
         menuPanel.add(menuTextPanel);
         menuTextPanel.setLayout(new GridLayout(1, 0, 0, 0));
 
-        JLabel helloLabel = new JLabel(currentUsername);
+        JLabel helloLabel = new JLabel("Hello " + currentUsername);
         helloLabel.setHorizontalAlignment(SwingConstants.CENTER);
         menuTextPanel.add(helloLabel);
 
-        JLabel balanceLabel = new JLabel(String.valueOf(organizerController.getBalance(currentUsername)));
+        JLabel balanceLabel = new JLabel("Balance: " + String.valueOf(organizerController.getBalance(currentUsername))+ "$");
         balanceLabel.setHorizontalAlignment(SwingConstants.CENTER);
         menuTextPanel.add(balanceLabel);
 
