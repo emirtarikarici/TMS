@@ -404,9 +404,12 @@ public class UserMainPage extends JFrame{
                         frame.dispose();
                         UserMainPage userMainPage = new UserMainPage(currentUsername);
                     }
-                    else{
+                    else if(userController.getBalance(currentUsername) < event.getPrice()){
                         JDialog addBalanceWindowFrame = addBalanceWindow(currentUsername,frame);
                         addBalanceWindowFrame.setVisible(true);
+                    }
+                    else{
+                        addBalanceWindow(currentUsername, frame);
                     }
 
 
