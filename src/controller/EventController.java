@@ -12,6 +12,8 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
 import model.Event;
+import model.Ticket;
+import model.User;
 
 public class EventController {
     private Connection connection;
@@ -69,6 +71,9 @@ public class EventController {
     public boolean updateEvent(int eventId, String name, String organizerUsername, Timestamp date,
             String location, int capacity, double price) {
         try {
+            if (!this.validateEvent(date, location)) {
+                return false;
+            }
             preparedStatement = connection.prepareStatement(
                     "UPDATE event SET name = ?, organizerUsername = ?, date = ?, location = ?, capacity = ?, price = ? WHERE id = ?");
             preparedStatement.setString(1, name);
@@ -242,6 +247,26 @@ public class EventController {
         } catch (SQLException e) {
             e.printStackTrace();
             return false;
+        }
+    }
+
+    public ArrayList<User> getAttendees(int id) {
+        try {
+            preparedStatement = connection.prepareStatement(
+                    "SELECT * FROM user WHERE username IN (SELECT userUsername FROM ticket WHERE eventId = ? AND status = ?)");
+            preparedStatement.setInt(1, id);
+            preparedStatement.setInt(2, Ticket.ACTIVE);
+            resultSet = preparedStatement.executeQuery();
+            ArrayList<User> users = new ArrayList<User>();
+            while (resultSet.next()) {
+                users.add(new User(resultSet.getString("username"),
+                        resultSet.getString("password"),
+                        resultSet.getDouble("balance")));
+            }
+            return users;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
         }
     }
 }
