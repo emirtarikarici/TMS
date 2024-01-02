@@ -83,9 +83,9 @@ class EventControllerTest {
 
             assertTrue(Math.abs(expectedTime - actualTime) <= tolerance);
 
-            assertEquals(eventController.getEventById(eventID_1).getLocation(), "Updated Location");
-            assertEquals(eventController.getEventById(eventID_1).getCapacity(), 150);
-            assertEquals(eventController.getEventById(eventID_1).getPrice(), 40.50);
+            assertEquals("Updated Location",eventController.getEventById(eventID_1).getLocation());
+            assertEquals(150, eventController.getEventById(eventID_1).getCapacity());
+            assertEquals(40.50, eventController.getEventById(eventID_1).getPrice());
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -321,4 +321,40 @@ class EventControllerTest {
         assertFalse(eventController.isEventExpired(id2));
 
     }
+
+    @Test
+    void getAttendees(){
+     try {
+        statement = connection.createStatement();
+        long currentTimeMillis = System.currentTimeMillis();
+        Timestamp date2 = new Timestamp(currentTimeMillis + TimeUnit.DAYS.toMillis(3));
+
+        controller.registerController.register("eee", "111111", RegisterController.ORGANIZER);
+        controller.registerController.register("ppp", "333333", RegisterController.USER);
+        controller.registerController.register("kkk", "222222", RegisterController.USER);
+        controller.userController.addBalance("ppp",100.0);
+        controller.userController.addBalance("kkk",200.0);
+        int eventId = eventController.createEvent("Event", "eee", new Timestamp(date2.getTime()), "location-", 40, 50.0);
+
+        int ticketId1 = controller.ticketController.createTicket("ppp",eventId);
+        controller.transactionController.createTransaction("ppp","eee",ticketId1);
+
+        int ticketId2 = controller.ticketController.createTicket("kkk",eventId);
+        controller.transactionController.createTransaction("kkk","eee",ticketId2);
+
+        assertEquals(2,eventController.getAttendees(eventId).size());
+        assertEquals("kkk",eventController.getAttendees(eventId).get(0).getUsername());
+        assertEquals("ppp", eventController.getAttendees(eventId).get(1).getUsername());
+        assertEquals("222222", eventController.getAttendees(eventId).get(0).getPassword());
+        assertEquals("333333", eventController.getAttendees(eventId).get(1).getPassword());
+        assertEquals(150.0, eventController.getAttendees(eventId).get(0).getBalance());
+        assertEquals(50.0, eventController.getAttendees(eventId).get(1).getBalance());
+
+
+    } catch (SQLException e) {
+        e.printStackTrace();
+        fail("Exception occurred: " + e.getMessage());
+    }
+
+}
 }
