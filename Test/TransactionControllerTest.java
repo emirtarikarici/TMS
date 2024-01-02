@@ -2,9 +2,13 @@ import controller.TransactionController;
 import model.Transaction;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.sql.Connection;
 import java.util.ArrayList;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 
 public class TransactionControllerTest {
@@ -20,6 +24,18 @@ public class TransactionControllerTest {
     void tearDown() throws Exception {
         Main.dropAllTables(connection);
         connection.close();
+    }
+
+    @Test
+    public void validateTransactionReturnsTrueWhenValid() {
+        transactionController.setValidateTransactionResult(true);
+        assertTrue(transactionController.validateTransaction("username", 1));
+    }
+
+    @Test
+    public void validateTransactionReturnsFalseWhenInvalid() {
+        transactionController.setValidateTransactionResult(false);
+        assertFalse(transactionController.validateTransaction("username", 1));
     }
 
     private static class TestableTransactionController extends TransactionController {
