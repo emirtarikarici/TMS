@@ -45,7 +45,7 @@ public class UserMainPage extends JFrame{
         EventQueue.invokeLater(new Runnable() {
             public void run() {
                 try {
-                    UserMainPage window = new UserMainPage("Temp");
+                    new UserMainPage("Temp");
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -89,7 +89,7 @@ public class UserMainPage extends JFrame{
             @Override
             public void mouseClicked(MouseEvent e) {
                 frame.dispose();
-                UserMainPage userMainPage = new UserMainPage(currentUsername);
+                new UserMainPage(currentUsername);
             }
         });
         menuButtonPanel.add(homeButton);
@@ -100,7 +100,7 @@ public class UserMainPage extends JFrame{
             @Override
             public void mouseClicked(MouseEvent e) {
                 frame.dispose();
-                ProfilePage profilePage = new ProfilePage(currentUsername);
+                new ProfilePage(currentUsername);
             }
         });
         menuButtonPanel.add(profileButton);
@@ -111,7 +111,7 @@ public class UserMainPage extends JFrame{
             @Override
             public void mouseClicked(MouseEvent e) {
                 frame.dispose();
-                LoginPage Lwindow = new LoginPage();
+                new LoginPage();
             }
         });
         menuButtonPanel.add(logoutButton);
@@ -272,7 +272,7 @@ public class UserMainPage extends JFrame{
                     if(transactionController.cancelTransaction(transactionNumber)){
                         JOptionPane.showMessageDialog(new JFrame(), "Ticket is cancelled successfully.");
                         frame.dispose();
-                        UserMainPage userMainPage = new UserMainPage(currentUsername);
+                        new UserMainPage(currentUsername);
                     }
                     else{
                         JOptionPane.showMessageDialog(new JFrame(), "Ticket cannot be cancelled");
@@ -390,7 +390,6 @@ public class UserMainPage extends JFrame{
                     JOptionPane.showMessageDialog(new JFrame(), "There is no selected event");
                 }
                 else{
-                    float price = 100;
                     int eventId = (int)(table.getValueAt(selectedRow, 0));
                     Event event = eventController.getEventById(eventId);
                     int ticketId = ticketController.createTicket(currentUsername,eventId);
@@ -402,7 +401,7 @@ public class UserMainPage extends JFrame{
                     if (transactionId != -1){
                         JOptionPane.showMessageDialog(new JFrame(), "Ticket is booked successfully.  ");
                         frame.dispose();
-                        UserMainPage userMainPage = new UserMainPage(currentUsername);
+                        new UserMainPage(currentUsername);
                     }
                     else if(userController.getBalance(currentUsername) < event.getPrice()){
                         JDialog addBalanceWindowFrame = addBalanceWindow(currentUsername,frame);
